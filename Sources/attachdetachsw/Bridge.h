@@ -28,8 +28,6 @@
 @interface DIDeviceHandle : NSObject
 -(NSString *)BSDName;
 -(unsigned long long)regEntryID;
--(void)setBSDName:(NSString *)arg1 ;
--(BOOL)updateBSDNameWithError:(NSError *)arg1 ;
 @end
 
 @interface DiskImages2 : NSObject

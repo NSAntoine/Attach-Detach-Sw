@@ -38,6 +38,9 @@ if CMDLineArgs.isEmpty || userWantsHelpMessage || (!doDetach && !doAttach) {
 
 if doDetach {
     let arrOfDiskPathsSpecified = CMDLineArgs.filter() { $0.contains("disk") }
+    guard !arrOfDiskPathsSpecified.isEmpty else {
+        fatalError("User used --detach / -d however did not specify a valid disk name. See attachdetachsw --help for more information.")
+    }
     for DiskName in arrOfDiskPathsSpecified {
         var diskNameToUse = DiskName
         diskNameToUse.hasPrefix("/dev/") ? nil : diskNameToUse.insert(contentsOf: "/dev/", at: diskNameToUse.startIndex)
@@ -70,8 +73,8 @@ if doDetach {
 
 if doAttach {
     let arrOfSpecifiedDMGs = CMDLineArgs.filter() { NSString(string: $0).pathExtension == "dmg" && FileManager.default.fileExists(atPath: $0) }
-    if arrOfSpecifiedDMGs.isEmpty {
-        fatalError("User used --attach / -a however either didn't specify a DMG file or specified a DMG file that doesn't exist.")
+    guard !arrOfSpecifiedDMGs.isEmpty else {
+        fatalError("User used --attach / -a however either didn't specify a DMG file or specified a DMG file that doesn't exist. See attachdetachsw --help for more information.")
     }
     var handler: DIDeviceHandle?
     for dmg in arrOfSpecifiedDMGs {
