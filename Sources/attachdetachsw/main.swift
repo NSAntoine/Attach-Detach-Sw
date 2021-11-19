@@ -6,20 +6,20 @@ let CMDLineArgs = Array(CommandLine.arguments.dropFirst())
 let doDetach = CMDLineArgs.contains("--detach") || CMDLineArgs.contains("-d")
 let doAttach = CMDLineArgs.contains("--attach") || CMDLineArgs.contains("-a")
 let userWantsHelpMessage = CMDLineArgs.contains("--help") || CMDLineArgs.contains("-h")
-let shouldSetAutoMount = CMDLineArgs.contains("--set-auto-mount")
+let shouldSetAutoMount = CMDLineArgs.contains("--set-auto-mount") || CMDLineArgs.contains("-s")
 let shouldPrintRegEntryID = CMDLineArgs.contains("--get-reg-entry-id") || CMDLineArgs.contains("-g")
 
 func printHelp() {
     print("""
           AttachDetachSW --- A Swift recreation of attach-detach.
           
-          General Options:
+          Core Options:
           -a, --attach [DMGFILE]            Specify a DMG file to attach
           -d, --detach [DISKNAME]           Specify a disk name to detach
           
           Attach Options:
-          --file-mode=FILEMODE              Specify the filemode to attach the specified DMG with
-          --set-auto-mount                  Sets the automount to true while attaching specified DMG
+          -f, --file-mode=FILEMODE          Specify the filemode to attach the specified DMG with, where FILEMODE is a number
+          -s, --set-auto-mount              Sets the automount to true while attaching specified DMG
           -g, --get-reg-entry-id            Prints the RegEntryID after attaching DMG
           
           Notes:
@@ -81,9 +81,10 @@ if doAttach {
             fatalError("Error encountered with DIAttachParams: \(errToShow ?? "Unknown Error")")
         }
         attachParams?.autoMount = shouldSetAutoMount
-        let fileModeArr = CMDLineArgs.filter() { $0.hasPrefix("--file-mode=") }
+        let fileModeArr = CMDLineArgs.filter() { $0.hasPrefix("--file-mode=") || $0.hasPrefix("-f=") }
         if !fileModeArr.isEmpty {
-            let fileModeSpecified = fileModeArr[0].replacingOccurrences(of: "--file-mode=", with: "")
+            var fileModeSpecified = fileModeArr[0].replacingOccurrences(of: "--file-mode=", with: "")
+            fileModeSpecified = fileModeSpecified.replacingOccurrences(of: "-f=", with: "")
             guard let fileModeSpecifiedInt = Int64(fileModeSpecified) else {
                 fatalError("User used --file-mode however there was either no file mode specified or the filemode specified wasn't an Int. SYNTAX: --file-mode=FILE-MODE, example: --file-mode=2")
             }
