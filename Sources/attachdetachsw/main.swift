@@ -8,26 +8,28 @@ let doAttach = CMDLineArgs.contains("--attach") || CMDLineArgs.contains("-a")
 let userWantsHelpMessage = CMDLineArgs.contains("--help") || CMDLineArgs.contains("-h")
 let shouldSetAutoMount = CMDLineArgs.contains("--set-auto-mount") || CMDLineArgs.contains("-s")
 let shouldPrintRegEntryID = CMDLineArgs.contains("--get-reg-entry-id") || CMDLineArgs.contains("-g")
+let shouldPrintAllDiskDirs = CMDLineArgs.contains("--all-disk-dirs")
 
 func printHelp() {
     print("""
           AttachDetachSW --- A Swift recreation of attach-detach.
           
           General Options:
-          -a, --attach [DMGFILE]            Specify a DMG file to attach
-          -d, --detach [DISKNAME]           Specify a disk name to detach
+            -a, --attach [DMGFILE]            Specify a DMG file to attach
+            -d, --detach [DISKNAME]           Specify a disk name to detach
           
           Attach Options:
-          -f, --file-mode=FILEMODE          Specify the filemode to attach the specified DMG with, where FILEMODE is a number
-          -s, --set-auto-mount              Sets the automount to true while attaching specified DMG
-          -g, --get-reg-entry-id            Prints the RegEntryID after attaching DMG
+            --all-disk-dirs                   Prints all the /dev/disk directories that the DMG was attached to
+            -f, --file-mode=FILEMODE          Specify the filemode to attach the specified DMG with, where FILEMODE is a number
+            -s, --set-auto-mount              Sets the automount to true while attaching specified DMG
+            -g, --get-reg-entry-id            Prints the RegEntryID of the disk that the DMG was attached to
           
           Notes:
-          It doesn't make sense to use any Attach Options with --detach / -d
+            It doesn't make sense to use any Attach Options with --detach / -d
           
           Example usage:
-          attachdetachsw --attach randomDMG.dmg
-          attachdetachsw --detach disk7
+            attachdetachsw --attach randomDMG.dmg
+            attachdetachsw --detach disk7
           """)
 }
 if CMDLineArgs.isEmpty || userWantsHelpMessage || (!doDetach && !doAttach) {
@@ -103,6 +105,13 @@ if doAttach {
             fatalError("Attached DMG \"\(dmg)\" However couldn't get name of attached disk.")
         }
         print("Attached as \(bsdName)")
+        let devDiskDirsThatShouldExist = ["/dev/\(bsdName)", "/dev/\(bsdName)s1", "/dev/\(bsdName)s1s1"].filter() { FileManager.default.fileExists(atPath: $0) }
+        if shouldPrintAllDiskDirs {
+            print("dev disk dirs that exist: ")
+            for dir in devDiskDirsThatShouldExist {
+                print(dir)
+            }
+        }
         if shouldPrintRegEntryID {
             if let regEntryID = handler?.regEntryID() {
                 print("regEntryID: \(regEntryID)")
