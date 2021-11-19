@@ -69,12 +69,12 @@ if doDetach {
 }
 
 if doAttach {
-    let arrOfSpecifiedDMGs = CMDLineArgs.filter() { NSString(string: $0).pathExtension == "dmg" }
+    let arrOfSpecifiedDMGs = CMDLineArgs.filter() { NSString(string: $0).pathExtension == "dmg" && FileManager.default.fileExists(atPath: $0) }
+    if arrOfSpecifiedDMGs.isEmpty {
+        fatalError("User used --attach / -a however either didn't specify a DMG file or specified a DMG file that doesn't exist.")
+    }
     var handler: DIDeviceHandle?
     for dmg in arrOfSpecifiedDMGs {
-        guard FileManager.default.fileExists(atPath: dmg) else {
-            fatalError("File \"\(dmg)\" doesn't exist, there it can't be used.")
-        }
         let DMGURL = URL(fileURLWithPath: dmg)
         var err:NSError?
         let attachParams = DIAttachParams(url: DMGURL, error: err)
