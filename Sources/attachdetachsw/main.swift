@@ -85,8 +85,7 @@ if doAttach {
         attachParams?.autoMount = shouldSetAutoMount
         let fileModeArr = CMDLineArgs.filter() { $0.hasPrefix("--file-mode=") || $0.hasPrefix("-f=") }
         if !fileModeArr.isEmpty {
-            var fileModeSpecified = fileModeArr[0].replacingOccurrences(of: "--file-mode=", with: "")
-            fileModeSpecified = fileModeSpecified.replacingOccurrences(of: "-f=", with: "")
+            let fileModeSpecified = fileModeArr[0].replacingOccurrences(of: "--file-mode=", with: "").replacingOccurrences(of: "-f=", with: "") // remove both --file-mode= and -f= in order to get the specified number
             guard let fileModeSpecifiedInt = Int64(fileModeSpecified) else {
                 fatalError("User used --file-mode however there was either no file mode specified or the filemode specified wasn't an Int. SYNTAX: --file-mode=FILE-MODE, example: --file-mode=2")
             }
