@@ -1,0 +1,3 @@
+module DI2Support {
+    header "Bridge.h"
+}
