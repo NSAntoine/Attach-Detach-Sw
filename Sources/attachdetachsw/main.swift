@@ -13,7 +13,7 @@ func printHelp() {
     print("""
           AttachDetachSW --- A Swift recreation of attach-detach.
           
-          Core Options:
+          General Options:
           -a, --attach [DMGFILE]            Specify a DMG file to attach
           -d, --detach [DISKNAME]           Specify a disk name to detach
           
