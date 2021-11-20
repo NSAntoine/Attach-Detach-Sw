@@ -29,6 +29,7 @@
 -(NSString *)BSDName;
 -(unsigned long long)regEntryID;
 -(id)description;
+-(unsigned)ioMedia;
 @end
 
 @interface DiskImages2 : NSObject
