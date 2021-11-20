@@ -7,7 +7,7 @@ let doDetach = CMDLineArgs.contains("--detach") || CMDLineArgs.contains("-d")
 let doAttach = CMDLineArgs.contains("--attach") || CMDLineArgs.contains("-a")
 let userWantsHelpMessage = CMDLineArgs.contains("--help") || CMDLineArgs.contains("-h")
 let shouldSetAutoMount = CMDLineArgs.contains("--set-auto-mount") || CMDLineArgs.contains("-s")
-let shouldPrintRegEntryID = CMDLineArgs.contains("--get-reg-entry-id") || CMDLineArgs.contains("-g")
+let shouldPrintRegEntryID = CMDLineArgs.contains("--reg-entry-id") || CMDLineArgs.contains("-r")
 let shouldPrintAllDiskDirs = CMDLineArgs.contains("--all-disk-dirs")
 
 func printHelp() {
@@ -22,7 +22,7 @@ func printHelp() {
             --all-disk-dirs                   Prints all the /dev/disk directories that the DMG was attached to
             -f, --file-mode=FILEMODE          Specify the filemode to attach the specified DMG with, where FILEMODE is a number
             -s, --set-auto-mount              Sets the automount to true while attaching specified DMG
-            -g, --get-reg-entry-id            Prints the RegEntryID of the disk that the DMG was attached to
+            -r, --reg-entry-id                Prints the RegEntryID of the disk that the DMG was attached to
           
           Notes:
             It doesn't make sense to use any Attach Options with --detach / -d
@@ -76,7 +76,8 @@ if doAttach {
     guard !arrOfSpecifiedDMGs.isEmpty else {
         fatalError("User used --attach / -a however either didn't specify a DMG file or specified a DMG file that doesn't exist. See attachdetachsw --help for more information.")
     }
-    var handler: DIDeviceHandle?
+    var handler:DIDeviceHandle?
+    
     for dmg in arrOfSpecifiedDMGs {
         let DMGURL = URL(fileURLWithPath: dmg)
         var err:NSError?
@@ -102,24 +103,16 @@ if doAttach {
             let errToShow = err?.localizedFailureReason ?? err?.localizedDescription
             fatalError("Error encountered while attaching DMG \"\(dmg)\": \(errToShow ?? "Unknown Error")")
         }
-        
-        guard let bsdName = handler?.bsdName() else {
-            fatalError("Attached DMG \"\(dmg)\" However couldn't get name of attached disk.")
+        guard let handler = handler, let BSDName = handler.bsdName() else {
+            fatalError("Attached DMG However couldn't get info from handler..")
         }
-        print("Attached as \(bsdName)")
-        let devDiskDirsThatShouldExist = ["/dev/\(bsdName)", "/dev/\(bsdName)s1", "/dev/\(bsdName)s1s1"].filter() { FileManager.default.fileExists(atPath: $0) }
-        if shouldPrintAllDiskDirs {
-            print("dev disk dirs that exist: ")
-            for dir in devDiskDirsThatShouldExist {
-                print(dir)
-            }
-        }
+        print("Attached as \(BSDName)")
         if shouldPrintRegEntryID {
-            if let regEntryID = handler?.regEntryID() {
-                print("regEntryID: \(regEntryID)")
-            } else {
-                print("Wasn't able to obtain regEntryID.")
-            }
+            print("regEntryID: \(handler.regEntryID())")
+        }
+        let devDiskDirsThatDoExist = ["/dev/\(BSDName)", "/dev/\(BSDName)s1", "/dev/\(BSDName)s1s1"].filter() { FileManager.default.fileExists(atPath: $0) } // Make an array of the devDisk Dirs that should exist, and filter by the ones that actually do
+        if shouldPrintAllDiskDirs {
+            print("All dev disk directories: \(devDiskDirsThatDoExist.joined(separator: "\t"))")
         }
     }
 }

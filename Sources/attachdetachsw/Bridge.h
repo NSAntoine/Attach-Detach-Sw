@@ -28,6 +28,7 @@
 @interface DIDeviceHandle : NSObject
 -(NSString *)BSDName;
 -(unsigned long long)regEntryID;
+-(id)description;
 @end
 
 @interface DiskImages2 : NSObject
