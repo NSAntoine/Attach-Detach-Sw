@@ -25,15 +25,33 @@
 -(void)setAutoMount:(BOOL)arg1 ;
 @end
 
-@interface DIDeviceHandle : NSObject
+@class NSString, DIClient2IODaemonXPCHandler, NSXPCListenerEndpoint;
+
+@interface DIDeviceHandle : NSObject <NSSecureCoding, NSCoding> {
+
+    BOOL _handleRefCount;
+    unsigned _ioMedia;
+    NSString* _BSDName;
+    DIClient2IODaemonXPCHandler* _client2IOhandler;
+    unsigned long long _regEntryID;
+    NSXPCListenerEndpoint* _xpcEndpoint;
+
+}
+
+@property (assign,nonatomic) unsigned ioMedia;                                            //@synthesize ioMedia=_ioMedia - In the implementation block
+@property (nonatomic,readonly) unsigned long long regEntryID;                             //@synthesize regEntryID=_regEntryID - In the implementation block
+@property (nonatomic,retain) NSString * BSDName;                                          //@synthesize BSDName=_BSDName - In the implementation block
 -(NSString *)BSDName;
--(unsigned long long)regEntryID;
--(id)description;
 -(unsigned)ioMedia;
+-(id)description;
+-(void)dealloc;
+-(unsigned long long)regEntryID;
+-(BOOL)waitForDeviceWithError:(id*)arg1 ;
 @end
 
-@interface DiskImages2 : NSObject
 
+
+@interface DiskImages2 : NSObject
 +(void)attachWithParams:(DIAttachParams *)param handle:(DIDeviceHandle **)h error:(NSError **)err;
 
 @end

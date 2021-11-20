@@ -89,29 +89,27 @@ if doAttach {
             fatalError("Error encountered with DIAttachParams: \(errToShow ?? "Unknown Error")")
         }
         attachParams?.autoMount = shouldSetAutoMount
-        let fileModeArr = CMDLineArgs.filter() { $0.hasPrefix("--file-mode=") || $0.hasPrefix("-f=") }
-        if !fileModeArr.isEmpty {
-            let fileModeSpecified = fileModeArr[0].replacingOccurrences(of: "--file-mode=", with: "").replacingOccurrences(of: "-f=", with: "") // remove both --file-mode= and -f= in order to get the specified number
-            guard let fileModeSpecifiedInt = Int64(fileModeSpecified) else {
-                fatalError("User used --file-mode however there was either no file mode specified or the filemode specified wasn't an Int. SYNTAX: --file-mode=FILE-MODE, example: --file-mode=2")
+        let fileModeArr = CMDLineArgs.filter() { $0.hasPrefix("--file-mode=") || $0.hasPrefix("-f=") }.map() { $0.replacingOccurrences(of: "--file-mode=", with: "").replacingOccurrences(of: "-f=", with: "")}
+        if fileModeArr.indices.contains(0) {
+            guard let fileModeSpecified = Int64(fileModeArr[0]) else {
+                fatalError("User used --file-mode/-f however the filemode specified is not valid, the filemode specified must be an integer. Example: --file-mode=3")
             }
-            attachParams?.fileMode = fileModeSpecifiedInt
-            print("Set file mode to \(fileModeSpecifiedInt)")
+            print("Setting filemode to \(fileModeSpecified)")
+            attachParams?.fileMode = fileModeSpecified
         }
-        
         DiskImages2.attach(with: attachParams, handle: &handler, error: &err)
         
         guard err == nil else {
             let errToShow = err?.localizedFailureReason ?? err?.localizedDescription
             fatalError("Error encountered while attaching DMG \"\(dmg)\": \(errToShow ?? "Unknown Error")")
         }
-        guard let handler = handler, let BSDName = handler.bsdName() else {
+        guard let handler = handler, let BSDName = handler.bsdName else {
             fatalError("Attached DMG However couldn't get info from handler..")
         }
         print("Attached as \(BSDName)")
-        shouldPrintRegEntryID ? print("regEntryID: \(handler.regEntryID())") : nil
+        shouldPrintRegEntryID ? print("regEntryID: \(handler.regEntryID)") : nil
         let devDiskDirsThatDoExist = ["/dev/\(BSDName)", "/dev/\(BSDName)s1", "/dev/\(BSDName)s1s1"].filter() { FileManager.default.fileExists(atPath: $0) } // Make an array of the devDisk Dirs that should exist, and filter by the ones that actually do
         shouldPrintAllDiskDirs ? print("All dev disk directories DMG Was attached to: \(devDiskDirsThatDoExist.joined(separator: ", "))") : nil
-        shouldPrintioMedia ? print("ioMedia: \(handler.ioMedia())") : nil
+        shouldPrintioMedia ? print("ioMedia: \(handler.ioMedia)") : nil
     }
 }
