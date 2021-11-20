@@ -9,7 +9,6 @@ let userWantsHelpMessage = CMDLineArgs.contains("--help") || CMDLineArgs.contain
 let shouldSetAutoMount = CMDLineArgs.contains("--set-auto-mount") || CMDLineArgs.contains("-s")
 let shouldPrintRegEntryID = CMDLineArgs.contains("--reg-entry-id") || CMDLineArgs.contains("-r")
 let shouldPrintAllDiskDirs = CMDLineArgs.contains("--all-dirs") || CMDLineArgs.contains("-o")
-let shouldPrintioMedia = CMDLineArgs.contains("--io-media") || CMDLineArgs.contains("-i")
 
 func printHelp() {
     print("""
@@ -24,7 +23,6 @@ func printHelp() {
             -f, --file-mode=FILEMODE          Specify the filemode to attach the specified DMG with, where FILEMODE is a number
             -s, --set-auto-mount              Sets the automount to true while attaching specified DMG
             -r, --reg-entry-id                Prints the RegEntryID of the disk the DMG was attached to
-            -i, --io-media                    Prints the IOMedia of the disk the DMG was attached to
           
           Notes:
             It doesn't make sense to use any Attach Options with --detach / -d
@@ -110,6 +108,5 @@ if doAttach {
         shouldPrintRegEntryID ? print("regEntryID: \(handler.regEntryID)") : nil
         let devDiskDirsThatDoExist = ["/dev/\(BSDName)", "/dev/\(BSDName)s1", "/dev/\(BSDName)s1s1"].filter() { FileManager.default.fileExists(atPath: $0) } // Make an array of the devDisk Dirs that should exist, and filter by the ones that actually do
         shouldPrintAllDiskDirs ? print("All dev disk directories DMG Was attached to: \(devDiskDirsThatDoExist.joined(separator: ", "))") : nil
-        shouldPrintioMedia ? print("ioMedia: \(handler.ioMedia)") : nil
     }
 }
