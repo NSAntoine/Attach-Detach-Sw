@@ -8,7 +8,8 @@ let doAttach = CMDLineArgs.contains("--attach") || CMDLineArgs.contains("-a")
 let userWantsHelpMessage = CMDLineArgs.contains("--help") || CMDLineArgs.contains("-h")
 let shouldSetAutoMount = CMDLineArgs.contains("--set-auto-mount") || CMDLineArgs.contains("-s")
 let shouldPrintRegEntryID = CMDLineArgs.contains("--reg-entry-id") || CMDLineArgs.contains("-r")
-let shouldPrintAllDiskDirs = CMDLineArgs.contains("--all-disk-dirs") || CMDLineArgs.contains("-i")
+let shouldPrintAllDiskDirs = CMDLineArgs.contains("--all-dirs") || CMDLineArgs.contains("-o")
+let shouldPrintioMedia = CMDLineArgs.contains("--io-media") || CMDLineArgs.contains("-i")
 
 func printHelp() {
     print("""
@@ -19,10 +20,11 @@ func printHelp() {
             -d, --detach [DISKNAME]           Specify a disk name to detach
           
           Attach Options:
-            -i, --all-disk-dirs               Prints all the /dev/disk directories that the DMG was attached to
+            -o, --all-dirs                    Prints all the /dev/disk directories that the DMG was attached to
             -f, --file-mode=FILEMODE          Specify the filemode to attach the specified DMG with, where FILEMODE is a number
             -s, --set-auto-mount              Sets the automount to true while attaching specified DMG
-            -r, --reg-entry-id                Prints the RegEntryID of the disk that the DMG was attached to
+            -r, --reg-entry-id                Prints the RegEntryID of the disk the DMG was attached to
+            -i, --io-media                    Prints the IOMedia of the disk the DMG was attached to
           
           Notes:
             It doesn't make sense to use any Attach Options with --detach / -d
@@ -109,7 +111,7 @@ if doAttach {
         print("Attached as \(BSDName)")
         shouldPrintRegEntryID ? print("regEntryID: \(handler.regEntryID())") : nil
         let devDiskDirsThatDoExist = ["/dev/\(BSDName)", "/dev/\(BSDName)s1", "/dev/\(BSDName)s1s1"].filter() { FileManager.default.fileExists(atPath: $0) } // Make an array of the devDisk Dirs that should exist, and filter by the ones that actually do
-        shouldPrintAllDiskDirs ? print("All dev disk directories DMG Was attached to: \(devDiskDirsThatDoExist.joined(separator: "\t"))") : nil
-        
+        shouldPrintAllDiskDirs ? print("All dev disk directories DMG Was attached to: \(devDiskDirsThatDoExist.joined(separator: ", "))") : nil
+        shouldPrintioMedia ? print("ioMedia: \(handler.ioMedia())") : nil
     }
 }
