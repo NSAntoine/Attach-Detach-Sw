@@ -85,10 +85,10 @@ if doAttach {
     
     for dmg in arrOfSpecifiedDMGs {
         let DMGURL = URL(fileURLWithPath: dmg)
-        var err:NSError?
-        let attachParams = DIAttachParams(url: DMGURL, error: err)
-        guard err == nil else {
-            let errToShow = err?.localizedFailureReason ?? err?.localizedDescription
+        var attachParamsErr:NSError?
+        let attachParams = DIAttachParams(url: DMGURL, error: attachParamsErr)
+        guard attachParamsErr == nil else {
+            let errToShow = attachParamsErr?.localizedFailureReason ?? attachParamsErr?.localizedDescription
             fatalError("Error encountered with DIAttachParams: \(errToShow ?? "Unknown Error")")
         }
         attachParams?.autoMount = shouldSetAutoMount
@@ -102,12 +102,12 @@ if doAttach {
             attachParams?.fileMode = fileModeSpecified
         }
         
-        
-        DiskImages2.attach(with: attachParams, handle: &handler, error: &err) // Call attach function
+        var attachErr:NSError?
+        DiskImages2.attach(with: attachParams, handle: &handler, error: &attachErr) // Call attach function
         
         // Make sure no errors were encountered
-        guard err == nil else {
-            let errToShow = err?.localizedFailureReason ?? err?.localizedDescription
+        guard attachErr == nil else {
+            let errToShow = attachErr?.localizedFailureReason ?? attachErr?.localizedDescription
             fatalError("Error encountered while attaching DMG \"\(dmg)\": \(errToShow ?? "Unknown Error")")
         }
         // Get information from handler and make sure the program can get the name of the disk that the DMG was attached to
@@ -126,7 +126,7 @@ if doAttach {
             }
         }
         
-        print("Attached DMG \"\(dmg)\" as \(BSDName)")
+        print("Attached as \(BSDName)")
         
         if shouldPrintRegEntryID {
             print("regEntryID: \(handler.regEntryID)")
