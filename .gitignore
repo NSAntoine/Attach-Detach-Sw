@@ -1,3 +1,4 @@
 .theos/
 packages/
 .swiftpm/
+.DS_Store

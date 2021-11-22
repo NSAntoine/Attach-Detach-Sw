@@ -49,7 +49,12 @@
 -(BOOL)waitForDeviceWithError:(id*)arg1 ;
 @end
 
+@interface DIVerifyParams : DIBaseParams
 
++(BOOL)supportsSecureCoding;
+-(id)initWithURL:(id)arg1 error:(id*)arg2 ;
+-(BOOL)verifyWithError:(id*)arg1 ;
+@end
 
 @interface DiskImages2 : NSObject
 +(void)attachWithParams:(DIAttachParams *)param handle:(DIDeviceHandle **)h error:(NSError **)err;

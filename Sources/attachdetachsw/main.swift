@@ -10,6 +10,7 @@ let shouldSetAutoMount = CMDLineArgs.contains("--set-auto-mount") || CMDLineArgs
 let shouldPrintRegEntryID = CMDLineArgs.contains("--reg-entry-id") || CMDLineArgs.contains("-r")
 let shouldPrintAllDiskDirs = CMDLineArgs.contains("--all-dirs") || CMDLineArgs.contains("-o")
 let shouldPrintDescription = CMDLineArgs.contains("--description")
+let shouldVerify = CMDLineArgs.contains("--verify") || CMDLineArgs.contains("-v")
 
 func printHelp() {
     print("""
@@ -23,8 +24,10 @@ func printHelp() {
             -o, --all-dirs                    Prints all the /dev/disk directories that the DMG was attached to
             -f, --file-mode=FILEMODE          Specify the filemode to attach the specified DMG with, where FILEMODE is a number
             -s, --set-auto-mount              Sets the automount to true while attaching specified DMG
+            -v, --verify                      Verify that the DMG was successfully attached with DIVerifyParams
             -r, --reg-entry-id                Prints the RegEntryID of the disk the DMG was attached to
             --description                     Prints the disk description given by the handler
+          
           
           Notes:
             It doesn't make sense to use any Attach Options with --detach / -d
@@ -89,6 +92,7 @@ if doAttach {
             fatalError("Error encountered with DIAttachParams: \(errToShow ?? "Unknown Error")")
         }
         attachParams?.autoMount = shouldSetAutoMount
+        
         let fileModeArr = CMDLineArgs.filter() { $0.hasPrefix("--file-mode=") || $0.hasPrefix("-f=") }.map() { $0.replacingOccurrences(of: "--file-mode=", with: "").replacingOccurrences(of: "-f=", with: "")}
         if fileModeArr.indices.contains(0) {
             guard let fileModeSpecified = Int64(fileModeArr[0]) else {
@@ -97,20 +101,39 @@ if doAttach {
             print("Setting filemode to \(fileModeSpecified)")
             attachParams?.fileMode = fileModeSpecified
         }
-        DiskImages2.attach(with: attachParams, handle: &handler, error: &err)
         
+        
+        DiskImages2.attach(with: attachParams, handle: &handler, error: &err) // Call attach function
+        
+        // Make sure no errors were encountered
         guard err == nil else {
             let errToShow = err?.localizedFailureReason ?? err?.localizedDescription
             fatalError("Error encountered while attaching DMG \"\(dmg)\": \(errToShow ?? "Unknown Error")")
         }
+        // Get information from handler and make sure the program can get the name of the disk that the DMG was attached to
         guard let handler = handler, let BSDName = handler.bsdName else {
             fatalError("Attached DMG However couldn't get info from handler..")
         }
+        
+        if shouldVerify {
+            var verifyErr:AnyObject?
+            let DIVerify = DIVerifyParams(url: URL(fileURLWithPath: "/dev/\(BSDName)"), error: &verifyErr)
+            let hasSuccessfullyAttached = DIVerify?.verifyWithError(&verifyErr)
+            if let hasSuccessfullyAttached = hasSuccessfullyAttached, hasSuccessfullyAttached {
+                print("Verified that DMG was attached correctly")
+            } else {
+                fatalError("DMG Wasn't attached correctly.")
+            }
+        }
+        
         print("Attached as \(BSDName)")
+        
         if shouldPrintRegEntryID {
             print("regEntryID: \(handler.regEntryID)")
         }
+        
         let devDiskDirsThatDoExist = ["/dev/\(BSDName)", "/dev/\(BSDName)s1", "/dev/\(BSDName)s1s1"].filter() { FileManager.default.fileExists(atPath: $0) } // Make an array of the devDisk Dirs that should exist, and filter by the ones that actually do
+        
         if shouldPrintAllDiskDirs {
             print("All dev disk directories DMG Was attached to: \(devDiskDirsThatDoExist.joined(separator: ", "))")
         }
