@@ -26,8 +26,7 @@ Though these aren't necessary, the following options can be used:
 ### Attach Options
 - `-f, --file-mode=FILEMODE` Where FILEMODE is a number, sets the filemode while attaching
 - `-s, --set-auto-mount` Sets automount to true while attaching
-- `-g, --get-reg-entry-id` Prints the RegEntryID of the disk that the DMG was attached to
-- `-o, --all-dirs` Prints all the /dev/disk directories that the DMG was attached to
+- `-o, --all-dirs` Prints all the `/dev/disk` directories that the DMG was attached to
 - `-v, --verify` Verify that the DMG was successfully attached with DIVerifyParams
 - `-r, --reg-entry-id` Prints the RegEntryID of the disk the DMG was attached to
 - `--description` Prints the disk description given by the handler
