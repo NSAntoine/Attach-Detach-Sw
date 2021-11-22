@@ -116,17 +116,17 @@ if doAttach {
         }
         
         if shouldVerify {
-            var verifyErr:AnyObject?
-            let DIVerify = DIVerifyParams(url: URL(fileURLWithPath: "/dev/\(BSDName)"), error: &verifyErr)
-            let hasSuccessfullyAttached = DIVerify?.verifyWithError(&verifyErr)
+            var verifyErr:NSError?
+            let DIVerify = DIVerifyParams(url: URL(fileURLWithPath: "/dev/\(BSDName)"), error: verifyErr)
+            let hasSuccessfullyAttached = DIVerify?.verifyWithError(verifyErr)
             if let hasSuccessfullyAttached = hasSuccessfullyAttached, hasSuccessfullyAttached {
-                print("Verified that DMG was attached correctly")
+                print("Verified that DMG \"\(dmg)\" was attached correctly")
             } else {
-                fatalError("DMG Wasn't attached correctly.")
+                fatalError("DMG Wasn't attached correctly. Error encountered: \(verifyErr?.localizedFailureReason ?? verifyErr?.localizedDescription ?? "Unknown Error")")
             }
         }
         
-        print("Attached as \(BSDName)")
+        print("Attached DMG \"\(dmg)\" as \(BSDName)")
         
         if shouldPrintRegEntryID {
             print("regEntryID: \(handler.regEntryID)")

@@ -52,8 +52,8 @@
 @interface DIVerifyParams : DIBaseParams
 
 +(BOOL)supportsSecureCoding;
--(id)initWithURL:(id)arg1 error:(id*)arg2 ;
--(BOOL)verifyWithError:(id*)arg1 ;
+-(id)initWithURL:(id)arg1 error:(NSError *)arg2 ;
+-(BOOL)verifyWithError:(NSError *)arg1 ;
 @end
 
 @interface DiskImages2 : NSObject
