@@ -3,8 +3,12 @@ import DI2Support
 
 let CMDLineArgs = Array(CommandLine.arguments.dropFirst())
 
-let doDetach = CMDLineArgs.contains("--detach") || CMDLineArgs.contains("-d")
-let doAttach = CMDLineArgs.contains("--attach") || CMDLineArgs.contains("-a")
+let arrOfSpecifiedDMGs = CMDLineArgs.filter() { NSString(string: $0).pathExtension == "dmg" && FileManager.default.fileExists(atPath: $0) }
+let doAttach = (CMDLineArgs.contains("--attach") || CMDLineArgs.contains("-a")) || !arrOfSpecifiedDMGs.isEmpty // Detect if the user used --attach/-a or if the user specified a DMG without --attach/-a
+
+let arrOfDiskPathsSpecified = CMDLineArgs.filter() { $0.contains("disk") && NSString(string: $0).pathExtension != "dmg" }
+let doDetach = (CMDLineArgs.contains("--detach") || CMDLineArgs.contains("-d")) || !arrOfDiskPathsSpecified.isEmpty // Detect if the user used --detach/-d or if the user specified a disk without --detach/-d
+
 let userWantsHelpMessage = CMDLineArgs.contains("--help") || CMDLineArgs.contains("-h")
 let shouldSetAutoMount = CMDLineArgs.contains("--set-auto-mount") || CMDLineArgs.contains("-s")
 let shouldPrintRegEntryID = CMDLineArgs.contains("--reg-entry-id") || CMDLineArgs.contains("-r")
@@ -42,7 +46,6 @@ if CMDLineArgs.isEmpty || userWantsHelpMessage || (!doDetach && !doAttach) {
 }
 
 if doDetach {
-    let arrOfDiskPathsSpecified = CMDLineArgs.filter() { $0.contains("disk") }
     guard !arrOfDiskPathsSpecified.isEmpty else {
         fatalError("User used --detach / -d however did not specify a valid disk name. See attachdetachsw --help for more information.")
     }
@@ -77,7 +80,6 @@ if doDetach {
 }
 
 if doAttach {
-    let arrOfSpecifiedDMGs = CMDLineArgs.filter() { NSString(string: $0).pathExtension == "dmg" && FileManager.default.fileExists(atPath: $0) }
     guard !arrOfSpecifiedDMGs.isEmpty else {
         fatalError("User used --attach / -a however either didn't specify a DMG file or specified a DMG file that doesn't exist. See attachdetachsw --help for more information.")
     }
