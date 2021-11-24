@@ -96,12 +96,11 @@ if doAttach {
         attachParams?.autoMount = shouldSetAutoMount
         
         let fileModeArr = CMDLineArgs.filter() { $0.hasPrefix("--file-mode=") || $0.hasPrefix("-f=") }.map() { $0.replacingOccurrences(of: "--file-mode=", with: "").replacingOccurrences(of: "-f=", with: "")}
-        if fileModeArr.indices.contains(0) {
-            guard let fileModeSpecified = Int64(fileModeArr[0]) else {
-                fatalError("User used --file-mode/-f however the filemode specified is not valid, the filemode specified must be an integer. Example: --file-mode=3")
-            }
-            print("Setting filemode to \(fileModeSpecified)")
-            attachParams?.fileMode = fileModeSpecified
+        let fileModeArrIntOnly = fileModeArr.compactMap() { Int64($0) }
+        if !fileModeArrIntOnly.isEmpty {
+            let fileModeToSet = fileModeArrIntOnly[0]
+            print("Setting filmode to \(fileModeToSet)")
+            attachParams?.fileMode = fileModeToSet
         }
         
         var attachErr:NSError?
