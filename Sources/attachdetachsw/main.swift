@@ -10,7 +10,6 @@ let arrOfDiskPathsSpecified = CMDLineArgs.filter() { $0.contains("disk") && NSSt
 let doDetach = (CMDLineArgs.contains("--detach") || CMDLineArgs.contains("-d")) || !arrOfDiskPathsSpecified.isEmpty // Detect if the user used --detach/-d or if the user specified a disk without --detach/-d
 
 let userWantsHelpMessage = CMDLineArgs.contains("--help") || CMDLineArgs.contains("-h")
-let shouldSetAutoMount = CMDLineArgs.contains("--set-auto-mount") || CMDLineArgs.contains("-s")
 let shouldPrintRegEntryID = CMDLineArgs.contains("--reg-entry-id") || CMDLineArgs.contains("-r")
 let shouldPrintAllDiskDirs = CMDLineArgs.contains("--all-dirs") || CMDLineArgs.contains("-o")
 let shouldVerify = CMDLineArgs.contains("--verify") || CMDLineArgs.contains("-v")
@@ -30,13 +29,14 @@ func printHelp() {
             -v, --verify                      Verify that the DMG was successfully attached with DIVerifyParams
             -r, --reg-entry-id                Prints the RegEntryID of the disk the DMG was attached to
           
-          
           Notes:
-            It doesn't make sense to use any Attach Options with --detach / -d
+            If the user does not specify --attach/-a or --detach/-d, then it will attach any DMGs given or detach any given disk, which means using --attach/-a or --detach/-d is not needed most of the time. See example usage
           
           Example usage:
             attachdetachsw --attach randomDMG.dmg
             attachdetachsw --detach disk7
+            attachdetachsw someDMG.dmg --verify
+            attachdetachsw disk8
           """)
 }
 if CMDLineArgs.isEmpty || userWantsHelpMessage || (!doDetach && !doAttach) {
@@ -91,7 +91,7 @@ if doAttach {
             let errToShow = attachParamsErr?.localizedFailureReason ?? attachParamsErr?.localizedDescription
             fatalError("Error encountered with DIAttachParams: \(errToShow ?? "Unknown Error")")
         }
-        attachParams?.autoMount = shouldSetAutoMount
+        attachParams?.autoMount = CMDLineArgs.contains("--set-auto-mount") || CMDLineArgs.contains("-s")
         
         let fileModeArr = CMDLineArgs.filter() { $0.hasPrefix("--file-mode=") || $0.hasPrefix("-f=") }.map() { $0.replacingOccurrences(of: "--file-mode=", with: "").replacingOccurrences(of: "-f=", with: "")}
         let fileModeArrIntOnly = fileModeArr.compactMap() { Int64($0) }
