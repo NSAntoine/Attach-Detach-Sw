@@ -13,7 +13,6 @@ let userWantsHelpMessage = CMDLineArgs.contains("--help") || CMDLineArgs.contain
 let shouldSetAutoMount = CMDLineArgs.contains("--set-auto-mount") || CMDLineArgs.contains("-s")
 let shouldPrintRegEntryID = CMDLineArgs.contains("--reg-entry-id") || CMDLineArgs.contains("-r")
 let shouldPrintAllDiskDirs = CMDLineArgs.contains("--all-dirs") || CMDLineArgs.contains("-o")
-let shouldPrintDescription = CMDLineArgs.contains("--description")
 let shouldVerify = CMDLineArgs.contains("--verify") || CMDLineArgs.contains("-v")
 
 func printHelp() {
@@ -30,7 +29,6 @@ func printHelp() {
             -s, --set-auto-mount              Sets the automount to true while attaching specified DMG
             -v, --verify                      Verify that the DMG was successfully attached with DIVerifyParams
             -r, --reg-entry-id                Prints the RegEntryID of the disk the DMG was attached to
-            --description                     Prints the disk description given by the handler
           
           
           Notes:
@@ -137,13 +135,6 @@ if doAttach {
         
         if shouldPrintAllDiskDirs {
             print("All dev disk directories DMG Was attached to: \(devDiskDirsThatDoExist.joined(separator: ", "))")
-        }
-        
-        if shouldPrintDescription {
-            guard let description = handler.description() else {
-                fatalError("Couldn't get description.")
-            }
-            print("Description: \(description)")
         }
     }
 }

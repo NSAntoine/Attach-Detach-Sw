@@ -43,7 +43,6 @@
 @property (nonatomic,retain) NSString * BSDName;                                          //@synthesize BSDName=_BSDName - In the implementation block
 -(NSString *)BSDName;
 -(unsigned)ioMedia;
--(id)description;
 -(void)dealloc;
 -(unsigned long long)regEntryID;
 -(BOOL)waitForDeviceWithError:(id*)arg1 ;
