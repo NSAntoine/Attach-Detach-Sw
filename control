@@ -1,9 +1,9 @@
-Package: com.dabezt.attachdetachsw
+Package: com.serena.attachdetachsw
 Name: attachdetachsw
 Version: 0.0.1
 Architecture: iphoneos-arm
-Description: An awesome tool of some sort!!
-Maintainer: Dabezt
-Author: Dabezt
+Description: A Swift recreation of attach-detach, with a few configurable options.
+Maintainer: Serena-io
+Author: Serena-io
 Section: System
 Tag: role::hacker

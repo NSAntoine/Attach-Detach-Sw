@@ -107,7 +107,6 @@ if doAttach {
         // Handler which will have the info of the attached DMG
         var handler:DIDeviceHandle?
         
-        
         // If an error occurs while attaching, it'll be set to the following variable
         var attachErr:NSError?
         // Call attach function

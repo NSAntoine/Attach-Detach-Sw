@@ -36,7 +36,7 @@ There are currently no options for detaching.
 ## Building
 To build, you must have Theos and the swift-toolchain, you also must be building with a patched SDK. 
 ```
-git clone https://github.com/dabezt31/Attach-Detach-Sw/
+git clone https://github.com/Serena-io/Attach-Detach-Sw
 cd Attach-Detach-Sw
 make package
 ```
