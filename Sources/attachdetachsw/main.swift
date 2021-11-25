@@ -131,12 +131,11 @@ if doAttach {
         } else {
             var verifyErr:NSError?
             let DIVerify = DIVerifyParams(url: URL(fileURLWithPath: "/dev/\(BSDName)"), error: verifyErr)
-            if let wasSuccessfullyAttached = DIVerify?.verifyWithError(verifyErr), wasSuccessfullyAttached {
-                print("Verified that DMG \"\(dmg)\" was successfully attached.")
-            } else {
-                let errorToShow = verifyErr?.localizedFailureReason ?? verifyErr?.localizedDescription
-                print("Couldn't verify that DMG \"\(dmg)\" was successfully attached, Error encountered: \(errorToShow ?? "Unknown Error")")
+            guard let wasSuccessfullyAttached = DIVerify?.verifyWithError(verifyErr), wasSuccessfullyAttached else {
+                let errorEncountered = verifyErr?.localizedFailureReason ?? verifyErr?.localizedDescription
+                fatalError("Couldn't verify that DMG \"\(dmg)\" was succssfully attached, Error encountered: \(errorEncountered ?? "Unknown Error")")
             }
+            print("Verified that DMG Was successfully attached.")
         }
         
         print("Attached as \(BSDName)")
