@@ -14,7 +14,9 @@ let doDetach = (CMDLineArgs.contains("--detach") || CMDLineArgs.contains("-d")) 
 let userWantsHelpMessage = CMDLineArgs.contains("--help") || CMDLineArgs.contains("-h")
 let shouldPrintRegEntryID = CMDLineArgs.contains("--reg-entry-id") || CMDLineArgs.contains("-r")
 let shouldPrintAllDiskDirs = CMDLineArgs.contains("--all-dirs") || CMDLineArgs.contains("-o")
-let shouldVerify = CMDLineArgs.contains("--verify") || CMDLineArgs.contains("-v")
+// Short option for --detach: -d
+// Short option for --dont-verify: -D
+let shouldntVerify = CMDLineArgs.contains("--dont-verify") || CMDLineArgs.contains("-D")
 
 func printHelp() {
     print("""
@@ -26,9 +28,9 @@ func printHelp() {
           
           Attach Options:
             -o, --all-dirs                    Prints all the /dev/disk directories that the DMG was attached to
-            -f, --file-mode=FILEMODE          Specify the filemode to attach the specified DMG with, where FILEMODE is a number
+            -f, --file-mode=FILEMODE-NUMBER   Specify the filemode to attach the specified DMG with
             -s, --set-auto-mount              Sets the automount to true while attaching specified DMG
-            -v, --verify                      Verify that the DMG was successfully attached with DIVerifyParams
+            -D, --dont-verify                 Don't verify that the DMG was attached successfully
             -r, --reg-entry-id                Prints the RegEntryID of the disk the DMG was attached to
           
           Notes:
@@ -88,10 +90,6 @@ if doAttach {
         let DMGURL = URL(fileURLWithPath: dmg)
         var attachParamsErr:NSError?
         let attachParams = DIAttachParams(url: DMGURL, error: attachParamsErr)
-        guard attachParamsErr == nil else {
-            let errToShow = attachParamsErr?.localizedFailureReason ?? attachParamsErr?.localizedDescription
-            fatalError("Error encountered with DIAttachParams: \(errToShow ?? "Unknown Error")")
-        }
         
         attachParams?.autoMount = CMDLineArgs.contains("--set-auto-mount") || CMDLineArgs.contains("-s")
         
@@ -102,6 +100,12 @@ if doAttach {
             let fileModeToSet = fileModeArrIntOnly[0]
             print("Setting filmode to \(fileModeToSet)")
             attachParams?.fileMode = fileModeToSet
+        }
+        
+        // We should check for attachParams error only after we actually set all the parameters
+        guard attachParamsErr == nil else {
+            let errToShow = attachParamsErr?.localizedFailureReason ?? attachParamsErr?.localizedDescription
+            fatalError("Error encountered with Setting Attach Parameters: \(errToShow ?? "Unknown Error")")
         }
         
         // Handler which will have the info of the attached DMG
@@ -123,7 +127,7 @@ if doAttach {
         }
         
         // Below gets triggered if the user used --verify/-v
-        if shouldVerify {
+        if !shouldntVerify {
             var verifyErr:NSError?
             let DIVerify = DIVerifyParams(url: URL(fileURLWithPath: "/dev/\(BSDName)"), error: verifyErr)
             let hasSuccessfullyAttached = DIVerify?.verifyWithError(verifyErr)
