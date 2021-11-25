@@ -126,15 +126,16 @@ if doAttach {
             fatalError("Attached DMG However couldn't get info from handler..")
         }
         
-        // Below gets triggered if the user used --verify/-v
-        if !shouldntVerify {
+        if shouldntVerify {
+            print("Not verifying with DIVerifyParams becuase the user specified not to.")
+        } else {
             var verifyErr:NSError?
             let DIVerify = DIVerifyParams(url: URL(fileURLWithPath: "/dev/\(BSDName)"), error: verifyErr)
-            let hasSuccessfullyAttached = DIVerify?.verifyWithError(verifyErr)
-            if let hasSuccessfullyAttached = hasSuccessfullyAttached, hasSuccessfullyAttached {
-                print("Verified that DMG \"\(dmg)\" was attached correctly")
+            if let wasSuccessfullyAttached = DIVerify?.verifyWithError(verifyErr), wasSuccessfullyAttached {
+                print("Verified that DMG \"\(dmg)\" was successfully attached.")
             } else {
-                fatalError("DMG Wasn't attached correctly. Error encountered: \(verifyErr?.localizedFailureReason ?? verifyErr?.localizedDescription ?? "Unknown Error")")
+                let errorToShow = verifyErr?.localizedFailureReason ?? verifyErr?.localizedDescription
+                print("Couldn't verify that DMG \"\(dmg)\" was successfully attached, Error encountered: \(errorToShow ?? "Unknown Error")")
             }
         }
         
