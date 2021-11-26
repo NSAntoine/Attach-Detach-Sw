@@ -6,7 +6,7 @@ TOOL_NAME = attachdetachsw
 
 attachdetachsw_FILES = Sources/attachdetachsw/main.swift
 attachdetachsw_PRIVATE_FRAMEWORKS = DiskImages2
-attachdetachsw_SWIFTFLAGS = -ISources/attachdetachsw/
+attachdetachsw_SWIFTFLAGS = -ISources/attachdetachsw/ -suppress-warnings
 attachdetachsw_CODESIGN_FLAGS = -Sentitlements.plist
 attachdetachsw_INSTALL_PATH = /usr/local/bin
 

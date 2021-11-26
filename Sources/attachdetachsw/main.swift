@@ -57,7 +57,6 @@ if doDetach {
         
         let fd = open(diskNameToUse, O_RDONLY)
         guard fd != -1 else {
-            close(fd)
             fatalError("Error encountered while opening \(diskNameToUse): \(String(cString: strerror(errno)))")
         }
         
@@ -74,7 +73,6 @@ if doDetach {
         }
         let ret = ioctl(fd, ioctlEjectCode)
         guard ret != -1 else {
-            close(fd)
             fatalError("Error encountered while ejecting \(diskNameToUse): \(String(cString: strerror(errno)))")
         }
         print("Detached \(diskNameToUse)")
@@ -113,6 +111,7 @@ if doAttach {
         
         // If an error occurs while attaching, it'll be set to the following variable
         var attachErr:NSError?
+        
         // Call attach function
         DiskImages2.attach(with: attachParams, handle: &handler, error: &attachErr)
         
