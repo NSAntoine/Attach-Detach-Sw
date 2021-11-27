@@ -1,7 +1,8 @@
+// Contains functions for attaching and detaching
+
 import Foundation
 import DI2Support
 
-// Contains functions for attaching and detaching
 func detachDisk(DiskName: inout String) {
     
     // If the disk name specified dosesn't start with "/dev/", insert "/dev/" to it at the beginning

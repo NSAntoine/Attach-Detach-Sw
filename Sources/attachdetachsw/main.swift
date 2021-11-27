@@ -13,8 +13,6 @@ let doDetach = (CMDLineArgs.contains("--detach") || CMDLineArgs.contains("-d")) 
 let shouldPrintRegEntryID = CMDLineArgs.contains("--reg-entry-id") || CMDLineArgs.contains("-r")
 let shouldPrintAllDiskDirs = CMDLineArgs.contains("--all-dirs") || CMDLineArgs.contains("-o")
 // Short option for --detach: -d
-// Short option for --dont-verify: -D
-let shouldntVerify = CMDLineArgs.contains("--dont-verify") || CMDLineArgs.contains("-D")
 
 func printHelp() {
     print("""
