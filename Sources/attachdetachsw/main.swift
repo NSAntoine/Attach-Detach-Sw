@@ -20,7 +20,8 @@ let shouldntVerify = CMDLineArgs.contains("--dont-verify") || CMDLineArgs.contai
 
 func printHelp() {
     print("""
-          AttachDetachSW --- A Swift recreation of attach-detach.
+          AttachDetachSW --- A Swift recreation of attach-detach with some configurable options.
+          Made by Serena-io.
           
           General Options:
             -a, --attach [DMGFILE]            Specify a DMG file to attach
@@ -43,8 +44,19 @@ func printHelp() {
             attachdetachsw disk8
           """)
 }
-if CMDLineArgs.isEmpty || userWantsHelpMessage || (!doDetach && !doAttach) {
+if userWantsHelpMessage {
     printHelp()
+    exit(0)
+}
+
+if CMDLineArgs.isEmpty || (!doDetach && !doAttach) {
+    print("User must specify a DMG to attach, or a disk name to detach")
+    print("Examples:")
+    print("attachdetachsw --attach randomDMG.dmg")
+    print("attachdetachsw --detach disk7")
+    print("Use attachdetachsw --help to see more.")
+    print("Exiting.")
+    exit(2)
 }
 
 if doDetach {
@@ -61,7 +73,6 @@ if doDetach {
         }
         
         // See more here: https://stackoverflow.com/questions/69961734/getting-ioctl-numbers-in-swit/69961934#69961934
-        
         var ioctlEjectCode:UInt {
             let IOC_VOID: UInt = 0x20000000
             // DKIOEJECT Code is the 21th of group d

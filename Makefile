@@ -4,7 +4,7 @@ include $(THEOS)/makefiles/common.mk
 
 TOOL_NAME = attachdetachsw
 
-attachdetachsw_FILES = Sources/attachdetachsw/main.swift
+attachdetachsw_FILES = $(wildcard Sources/attachdetachsw/*.swift)
 attachdetachsw_PRIVATE_FRAMEWORKS = DiskImages2
 attachdetachsw_SWIFTFLAGS = -ISources/attachdetachsw/ -suppress-warnings
 attachdetachsw_CODESIGN_FLAGS = -Sentitlements.plist
