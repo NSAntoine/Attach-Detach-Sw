@@ -11,7 +11,6 @@ let arrOfDiskPathsSpecified = CMDLineArgs.filter() { $0.contains("disk") && NSSt
 // Detect if the user used --detach/-d or if the user specified a disk without --detach/-d
 let doDetach = (CMDLineArgs.contains("--detach") || CMDLineArgs.contains("-d")) || !arrOfDiskPathsSpecified.isEmpty
 
-let userWantsHelpMessage = CMDLineArgs.contains("--help") || CMDLineArgs.contains("-h")
 let shouldPrintRegEntryID = CMDLineArgs.contains("--reg-entry-id") || CMDLineArgs.contains("-r")
 let shouldPrintAllDiskDirs = CMDLineArgs.contains("--all-dirs") || CMDLineArgs.contains("-o")
 // Short option for --detach: -d
@@ -31,7 +30,6 @@ func printHelp() {
             -o, --all-dirs                    Prints all the /dev/disk directories that the DMG was attached to
             -f, --file-mode=FILEMODE-NUMBER   Specify the filemode to attach the specified DMG with
             -s, --set-auto-mount              Sets the automount to true while attaching specified DMG
-            -D, --dont-verify                 Don't verify that the DMG was attached successfully
             -r, --reg-entry-id                Prints the RegEntryID of the disk the DMG was attached to
           
           Notes:
@@ -40,11 +38,11 @@ func printHelp() {
           Example usage:
             attachdetachsw --attach randomDMG.dmg
             attachdetachsw --detach disk7
-            attachdetachsw someDMG.dmg --verify
+            attachdetachsw someDMG.dmg
             attachdetachsw disk8
           """)
 }
-if userWantsHelpMessage {
+if CMDLineArgs.contains("--help") || CMDLineArgs.contains("-h") {
     printHelp()
     exit(0)
 }
@@ -63,13 +61,16 @@ if doDetach {
     guard !arrOfDiskPathsSpecified.isEmpty else {
         fatalError("User used --detach / -d however did not specify a valid disk name. See attachdetachsw --help for more information.")
     }
-    for DiskName in arrOfDiskPathsSpecified {
-        var diskNameToUse = DiskName
-        diskNameToUse.hasPrefix("/dev/") ? nil : diskNameToUse.insert(contentsOf: "/dev/", at: diskNameToUse.startIndex)
+    for var DiskName in arrOfDiskPathsSpecified {
+        // If the disk name specified dosesn't start with "/dev/", insert "/dev/" to it at the beginning
+        if !DiskName.hasPrefix("/dev/") {
+            DiskName.insert(contentsOf: "/dev/", at: DiskName.startIndex)
+        }
         
-        let fd = open(diskNameToUse, O_RDONLY)
+        let fd = open(DiskName, O_RDONLY)
         guard fd != -1 else {
-            fatalError("Error encountered while opening \(diskNameToUse): \(String(cString: strerror(errno)))")
+            let errorEncountered = String(cString: strerror(errno)) // Convert CString strerror to a swift string
+            fatalError("Error encountered while opening \(DiskName): \(errorEncountered)")
         }
         
         // See more here: https://stackoverflow.com/questions/69961734/getting-ioctl-numbers-in-swit/69961934#69961934
@@ -84,9 +85,10 @@ if doDetach {
         }
         let ret = ioctl(fd, ioctlEjectCode)
         guard ret != -1 else {
-            fatalError("Error encountered while ejecting \(diskNameToUse): \(String(cString: strerror(errno)))")
+            let errorEncountered = String(cString: strerror(errno)) // Convert CString strerror to a swift string
+            fatalError("Error encountered while ejecting \(DiskName): \(errorEncountered)")
         }
-        print("Detached \(diskNameToUse)")
+        print("Detached \(DiskName)")
     }
 }
 
@@ -105,12 +107,10 @@ if doAttach {
         // Check if the user used --file-mode or -f correctly
         let fileModeArr = CMDLineArgs.filter() { $0.hasPrefix("--file-mode=") || $0.hasPrefix("-f=") }.map() { $0.replacingOccurrences(of: "--file-mode=", with: "").replacingOccurrences(of: "-f=", with: "")}
         let fileModeArrIntOnly = fileModeArr.compactMap() { Int64($0) }
-        if !fileModeArrIntOnly.isEmpty {
-            let fileModeToSet = fileModeArrIntOnly[0]
-            print("Setting filmode to \(fileModeToSet)")
-            attachParams?.fileMode = fileModeToSet
-        }
         
+        // If the user did indeed specify a value with --file-mode/-f, set the fileMode to the specified value, otherwise keep it as the default.
+        fileModeArrIntOnly.indices.contains(0) ? attachParams?.fileMode = fileModeArrIntOnly[0] : nil
+        print("Proceeding to attach DMG \(dmg) with filemode \(attachParams?.fileMode ?? 1)")
         // We should check for attachParams error only after we actually set all the parameters
         guard attachParamsErr == nil else {
             let errToShow = attachParamsErr?.localizedFailureReason ?? attachParamsErr?.localizedDescription
@@ -134,18 +134,6 @@ if doAttach {
         // Get information from handler and make sure the program can get the name of the disk that the DMG was attached to
         guard let handler = handler, let BSDName = handler.bsdName else {
             fatalError("Attached DMG However couldn't get info from handler..")
-        }
-        
-        if shouldntVerify {
-            print("Not verifying with DIVerifyParams becuase the user specified not to.")
-        } else {
-            var verifyErr:NSError?
-            let DIVerify = DIVerifyParams(url: URL(fileURLWithPath: "/dev/\(BSDName)"), error: verifyErr)
-            guard let wasSuccessfullyAttached = DIVerify?.verifyWithError(verifyErr), wasSuccessfullyAttached else {
-                let errorEncountered = verifyErr?.localizedFailureReason ?? verifyErr?.localizedDescription
-                fatalError("Couldn't verify that DMG \"\(dmg)\" was succssfully attached, Error encountered: \(errorEncountered ?? "Unknown Error")")
-            }
-            print("Verified that DMG Was successfully attached.")
         }
         
         print("Attached as \(BSDName)")

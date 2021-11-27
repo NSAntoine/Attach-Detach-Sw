@@ -27,7 +27,6 @@ Though these aren't necessary, the following options can be used:
 - `-f, --file-mode=FILEMODE` Where FILEMODE is a number, sets the filemode while attaching
 - `-s, --set-auto-mount` Sets automount to true while attaching
 - `-o, --all-dirs` Prints all the `/dev/disk` directories that the DMG was attached to
-- `-D, --dont-verify` Don't verify that the DMG was attached successfully
 - `-r, --reg-entry-id` Prints the RegEntryID of the disk the DMG was attached to
 
 ### Detach Options
