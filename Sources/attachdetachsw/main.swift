@@ -4,8 +4,10 @@ let CMDLineArgs = Array(CommandLine.arguments.dropFirst())
 
 /// The DMGs specified by the user to attach
 let specifiedDMGs = CMDLineArgs.map {
+    // Resolve symlinks
     resolveSymlink(ofPath: $0)
 }.filter {
+    // Make sure each file is a DMG and and that the file exists
     NSString(string: $0).pathExtension == "dmg" && FileManager.default.fileExists(atPath: $0)
 }
 

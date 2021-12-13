@@ -43,14 +43,22 @@ func attachDMG(DMGFile dmg:String) {
     attachParams?.autoMount = CMDLineArgs.contains("--set-auto-mount") || CMDLineArgs.contains("-s")
     
     // Check if the user used --file-mode or -f correctly
-    let fileModeArr = CMDLineArgs.filter() { $0.hasPrefix("--file-mode=") || $0.hasPrefix("-f=") }.map() { $0.replacingOccurrences(of: "--file-mode=", with: "").replacingOccurrences(of: "-f=", with: "")}
-    let fileModeArrIntOnly = fileModeArr.compactMap() { Int64($0) }
+    let fileModeSpecified = CMDLineArgs.filter {
+        $0.hasPrefix("--file-mode=") || $0.hasPrefix("-f=")
+    }.map {
+        // Remove --file-mode=/-f= so we just have the number
+        $0.replacingOccurrences(of: "--file-mode=", with: "").replacingOccurrences(of: "-f=", with: "")
+    }.compactMap {
+        Int64($0)
+    }
     
     
     // If the user did indeed specify a value with --file-mode/-f
     // set the fileMode to the specified value
     // otherwise keep it as the default.
-    fileModeArrIntOnly.indices.contains(0) ? attachParams?.fileMode = fileModeArrIntOnly[0] : nil
+    if !fileModeSpecified.isEmpty {
+        attachParams?.fileMode = fileModeSpecified[0]
+    }
     print("Proceeding to attach DMG \(dmg) with filemode \(attachParams?.fileMode ?? 1)")
     
     // We should check for attachParams error only after we actually set all the parameters
