@@ -80,16 +80,16 @@ func attachDMG(DMGFile dmg:String) {
     
     print("Attached as \(BSDName)")
     
-//    if shouldPrintRegEntryID {
-//        print("regEntryID: \(handler.regEntryID)")
-//    }
+    if shouldPrintRegEntryID {
+        print("\(BSDName) regEntryID: \(handler.regEntryID)")
+    }
     
     // Make an array of the devDisk Dirs that should exist, and filter by the ones that actually do
     let devDiskDirsThatDoExist = ["/dev/\(BSDName)", "/dev/\(BSDName)s1", "/dev/\(BSDName)s1s1"].filter() { FileManager.default.fileExists(atPath: $0) }
     
-//    if shouldPrintAllDiskDirs {
-//        print("All dev disk directories DMG Was attached to: \(devDiskDirsThatDoExist.joined(separator: ", "))")
-//    }
+    if shouldPrintAllDiskDirs {
+        print("All dev disk directories DMG Was attached to: \(devDiskDirsThatDoExist.joined(separator: ", "))")
+    }
 }
 
 func resolveSymlink(ofPath path:String) -> String {
