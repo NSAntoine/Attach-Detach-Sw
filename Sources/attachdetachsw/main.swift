@@ -2,9 +2,15 @@ import Foundation
 
 let CMDLineArgs = Array(CommandLine.arguments.dropFirst())
 
-let arrOfSpecifiedDMGs = CMDLineArgs.filter() { NSString(string: $0).pathExtension == "dmg" && FileManager.default.fileExists(atPath: $0) }
+/// The DMGs specified by the user to attach
+let specifiedDMGs = CMDLineArgs.map {
+    resolveSymlink(ofPath: $0)
+}.filter {
+    NSString(string: $0).pathExtension == "dmg" && FileManager.default.fileExists(atPath: $0)
+}
+
 // Detect if the user used --attach/-a or if the user specified a DMG without --attach/-a
-let doAttach = (CMDLineArgs.contains("--attach") || CMDLineArgs.contains("-a")) || !arrOfSpecifiedDMGs.isEmpty
+let doAttach = (CMDLineArgs.contains("--attach") || CMDLineArgs.contains("-a")) || !specifiedDMGs.isEmpty
 
 let DiskPathsToEject = CMDLineArgs.filter() { $0.contains("disk") && NSString(string: $0).pathExtension != "dmg" }
 // Detect if the user used --detach/-d or if the user specified a disk without --detach/-d
@@ -64,11 +70,11 @@ if doDetach {
 }
 
 if doAttach {
-    guard !arrOfSpecifiedDMGs.isEmpty else {
+    guard !specifiedDMGs.isEmpty else {
         fatalError("User used --attach / -a however either didn't specify a DMG file or specified a DMG file that doesn't exist. See attachdetachsw --help for more information.")
     }
     
-    for dmg in arrOfSpecifiedDMGs {
+    for dmg in specifiedDMGs {
         attachDMG(DMGFile: dmg)
     }
 }

@@ -11,6 +11,7 @@ func detachDisk(DiskName: inout String) {
     }
     
     let fd = open(DiskName, O_RDONLY)
+    defer { close(fd) }
     guard fd != -1 else {
         let errorEncountered = String(cString: strerror(errno)) // Convert CString strerror to a swift string
         fatalError("Error encountered while opening \(DiskName): \(errorEncountered)")
@@ -46,7 +47,9 @@ func attachDMG(DMGFile dmg:String) {
     let fileModeArrIntOnly = fileModeArr.compactMap() { Int64($0) }
     
     
-    // If the user did indeed specify a value with --file-mode/-f, set the fileMode to the specified value, otherwise keep it as the default.
+    // If the user did indeed specify a value with --file-mode/-f
+    // set the fileMode to the specified value
+    // otherwise keep it as the default.
     fileModeArrIntOnly.indices.contains(0) ? attachParams?.fileMode = fileModeArrIntOnly[0] : nil
     print("Proceeding to attach DMG \(dmg) with filemode \(attachParams?.fileMode ?? 1)")
     
@@ -77,14 +80,21 @@ func attachDMG(DMGFile dmg:String) {
     
     print("Attached as \(BSDName)")
     
-    if shouldPrintRegEntryID {
-        print("regEntryID: \(handler.regEntryID)")
-    }
+//    if shouldPrintRegEntryID {
+//        print("regEntryID: \(handler.regEntryID)")
+//    }
     
     // Make an array of the devDisk Dirs that should exist, and filter by the ones that actually do
     let devDiskDirsThatDoExist = ["/dev/\(BSDName)", "/dev/\(BSDName)s1", "/dev/\(BSDName)s1s1"].filter() { FileManager.default.fileExists(atPath: $0) }
     
-    if shouldPrintAllDiskDirs {
-        print("All dev disk directories DMG Was attached to: \(devDiskDirsThatDoExist.joined(separator: ", "))")
-    }
+//    if shouldPrintAllDiskDirs {
+//        print("All dev disk directories DMG Was attached to: \(devDiskDirsThatDoExist.joined(separator: ", "))")
+//    }
 }
+
+func resolveSymlink(ofPath path:String) -> String {
+    let ResolvedPath = try? FileManager.default.destinationOfSymbolicLink(atPath: path)
+    // Return the resolved path if we were able to get it, otherwise return the normal path
+    return ResolvedPath ?? path
+}
+
