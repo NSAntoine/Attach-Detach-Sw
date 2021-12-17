@@ -61,10 +61,9 @@ func attachDMG(DMGFile dmg:String) {
     }
     print("Proceeding to attach DMG \(dmg) with filemode \(attachParams?.fileMode ?? 1)")
     
-    // We should check for attachParams error only after we actually set all the parameters
-    guard attachParamsErr == nil else {
-        let errToShow = attachParamsErr?.localizedFailureReason ?? attachParamsErr?.localizedDescription
-        fatalError("Error encountered with Setting Attach Parameters: \(errToShow ?? "Unknown Error")")
+    // check if there were any issues encountered with attach parameters
+    if let attachParamsErr = attachParamsErr {
+        fatalError("Error encountered while setting Attach Parameters: \(attachParamsErr.localizedDescription)")
     }
     
     // Handler which will have the info of the attached DMG
@@ -76,10 +75,13 @@ func attachDMG(DMGFile dmg:String) {
     // Call attach function
     let didSuccessfullyAttach = DiskImages2.attach(with: attachParams, handle: &handler, error: &attachErr)
     
-    // Make sure no errors were encountered and that didSuccessfullyAttach returns true
-    guard attachErr == nil, didSuccessfullyAttach else {
-        let errToShow = attachErr?.localizedFailureReason ?? attachErr?.localizedDescription
-        fatalError("Error encountered while attaching DMG \"\(dmg)\": \(errToShow ?? "Unknown Error")")
+    // Make sure didSuccessfullyAttach returns true
+    guard didSuccessfullyAttach else {
+        // Print the error if we can
+        if let attachErr = attachErr {
+            print("Error encountered with attaching DMG: \(attachErr.localizedDescription)")
+        }
+        fatalError("Couldn't successfully attach DMG \(dmg).")
     }
     // Get information from handler and make sure the program can get the name of the disk that the DMG was attachedq to
     guard let handler = handler, let BSDName = handler.bsdName else {
