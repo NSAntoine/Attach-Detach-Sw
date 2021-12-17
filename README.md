@@ -31,4 +31,6 @@ To get the original Image URL of a disk that is already attached, use the `-i / 
 ```
 attachdetachsw -i disk7
 ```
-Will return the URL Of the image that `disk7` was attached was, so, for example, if `disk7` was attached with a DMG at `/private/var/mobile/randomDMG.dmg`, that path will be printed 
+Will return the URL Of the image that `disk7` was attached was.
+
+So, for example, if `disk7` was attached with a DMG at `/private/var/mobile/randomDMG.dmg`, that path will be printed 
