@@ -17,25 +17,23 @@ func getIoctlNumber(group: Character, number n:UInt) -> UInt {
     return void | g | n
 }
 
-func detachDisk(diskName: String) {
-    
-    let fd = open(diskName, O_RDONLY)
-    // Just to be safe, close it once done
-    defer { close(fd) }
-    // Make sure no issues were encountered with opening the disk
+func detachDisk(diskPath path: String, completionHandler: (_ didDetach: Bool, _ errorEncountered: String?) -> Void) {
+    let fd = open(path, O_RDONLY)
     guard fd != -1 else {
+        // Convert C-String strerror to swift
         let errorEncountered = String(cString: strerror(errno))
-        fatalError("Error encountered with opening \(diskName): \(errorEncountered)")
+        return completionHandler(false, errorEncountered)
     }
     
-    let ejectIOCTLNumber = getIoctlNumber(group: "d", number: 21)
+    let ioctlEjectCode = getIoctlNumber(group: "d", number: 21)
     
-    let ret = ioctl(fd, ejectIOCTLNumber)
+    let ret = ioctl(fd, ioctlEjectCode)
     guard ret != -1 else {
         let errorEncountered = String(cString: strerror(errno))
-        fatalError("Error encountered with ejecting \(diskName): \(errorEncountered)")
+        return completionHandler(false, errorEncountered)
     }
-    print("Detached \(diskName)")
+    
+    return completionHandler(true, nil)
 }
 
 func AttachDMG(atPath path: String, completionHandler: (DIDeviceHandle?, Error?) -> Void) {

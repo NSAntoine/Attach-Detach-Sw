@@ -56,7 +56,14 @@ if shouldDetach {
         if !diskName.hasPrefix("/dev/") {
             diskName.insert(contentsOf: "/dev/", at: diskName.startIndex)
         }
-        detachDisk(diskName: diskName)
+        detachDisk(diskPath: diskName) { didDetach, errorEncountered in
+            guard didDetach, errorEncountered == nil else {
+                print("Error encountered with ejecting \(diskName): \(errorEncountered ?? "Unknown Error")")
+                exit(EXIT_FAILURE)
+            }
+            
+            print("Detached \(diskName)")
+        }
     }
 }
 
