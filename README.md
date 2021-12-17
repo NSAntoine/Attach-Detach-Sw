@@ -1,41 +1,34 @@
 # Attach-Detach-Sw
-A Swift Recreation of Attach-Detach, with some configurable options
+A CLI Tool written in Swift as a recreation of Attach-Detach, with some configurable options
 
-## Usage
-To use, you'll need to specify if you are attaching or detaching, See below:
 
-### Attaching
-To Attach a DMG, the following command should be run: `attachdetachsw --attach/-a DMGFILE`. Where `DMGFile` is the path of the DMG to attach.
-Example usage: 
+## Attaching 
+To attach, use the `-a / --attach` option and specify the DMG(s) to attach, for example:
 ```
-iPhone:~ mobile% attachdetachsw -a attachdetachsw.dmg
-Attached as disk6
+attachdetachsw --attach randomDMG.dmg
 ```
+Will attaching `randomDMG.dmg` and print out the disk that it was attached to 
 
-### Detaching 
-To detach/eject a disk, the following command should be run: `attachdetachsw --detach/-d diskWithNumebr` Where `diskWithNumebr` is the disk to eject.
-Example usage:
+### Attaching options:
+The following options can be used with `-a / --attach`:
+
+- `-f, --file-mode=FILE-MODE` Specify a FileMode to attach the DMG with, specified FileMode must be a number
+- `s, --set-auto-mount`       Sets Auto-Mount to true while attaching
+- `r, --reg-entry-id`         Prints the RegEntryID of the disk that the DMG was attached to
+- `-o, --all-dirs`            Prints all the directories to which the DMG was attached to
+
+## Detaching
+To detach, use `-d / --detach` option and specify the Disk Name(s) to detach, for example:
 ```
-iPhone:~ mobile% attachdetachsw -d disk6
-Detached /dev/disk6
+attachdetachsw -d disk7
 ```
+Will detach `disk7`, using `/dev/disk7` would be identical in this situation
 
-## Options
-Though these aren't necessary, the following options can be used:
+*Note: Detaching doesn't have any configurable options`
 
-### Attach Options
-- `-f, --file-mode=FILEMODE` Where FILEMODE is a number, sets the filemode while attaching
-- `-s, --set-auto-mount` Sets automount to true while attaching
-- `-o, --all-dirs` Prints all the `/dev/disk` directories that the DMG was attached to
-- `-r, --reg-entry-id` Prints the RegEntryID of the disk the DMG was attached to
-
-### Detach Options
-There are currently no options for detaching.
-
-## Building
-To build, you must have Theos and the swift-toolchain, you also must be building with a patched SDK. 
+## Getting the Image URL Of an attached disk
+To get the original Image URL of a disk that is already attached, use the `-i / --image-url` option, for example:
 ```
-git clone https://github.com/Serena-io/Attach-Detach-Sw
-cd Attach-Detach-Sw
-make package
+attachdetachsw -i disk7
 ```
+Will return the URL Of the image that `disk7` was attached was, so, for example, if `disk7` was attached with a DMG at `/private/var/mobile/randomDMG.dmg`, that path will be printed 
