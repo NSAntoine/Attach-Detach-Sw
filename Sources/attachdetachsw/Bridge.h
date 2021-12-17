@@ -49,6 +49,6 @@
 @end
 
 @interface DiskImages2 : NSObject
-+(void)attachWithParams:(DIAttachParams *)param handle:(DIDeviceHandle **)h error:(NSError **)err;
++(bool)attachWithParams:(DIAttachParams *)param handle:(DIDeviceHandle **)h error:(NSError **)err;
 
 @end

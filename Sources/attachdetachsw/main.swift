@@ -14,7 +14,9 @@ let specifiedDMGs = CMDLineArgs.map {
 // Detect if the user used --attach/-a or if the user specified a DMG without --attach/-a
 let doAttach = (CMDLineArgs.contains("--attach") || CMDLineArgs.contains("-a")) || !specifiedDMGs.isEmpty
 
-let DiskPathsToEject = CMDLineArgs.filter() { $0.contains("disk") && NSString(string: $0).pathExtension != "dmg" }
+let DiskPathsToEject = CMDLineArgs.filter {
+    $0.contains("disk") && NSString(string: $0).pathExtension != "dmg"
+}
 // Detect if the user used --detach/-d or if the user specified a disk without --detach/-d
 let doDetach = (CMDLineArgs.contains("--detach") || CMDLineArgs.contains("-d")) || !DiskPathsToEject.isEmpty
 

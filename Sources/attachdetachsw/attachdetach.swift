@@ -74,10 +74,10 @@ func attachDMG(DMGFile dmg:String) {
     var attachErr:NSError?
     
     // Call attach function
-    DiskImages2.attach(with: attachParams, handle: &handler, error: &attachErr)
+    let didSuccessfullyAttach = DiskImages2.attach(with: attachParams, handle: &handler, error: &attachErr)
     
-    // Make sure no errors were encountered
-    guard attachErr == nil else {
+    // Make sure no errors were encountered and that didSuccessfullyAttach returns true
+    guard attachErr == nil, didSuccessfullyAttach else {
         let errToShow = attachErr?.localizedFailureReason ?? attachErr?.localizedDescription
         fatalError("Error encountered while attaching DMG \"\(dmg)\": \(errToShow ?? "Unknown Error")")
     }
