@@ -7,7 +7,7 @@ To attach, use the `-a / --attach` option and specify the DMG(s) to attach, for 
 ```
 attachdetachsw --attach randomDMG.dmg
 ```
-Will attaching `randomDMG.dmg` and print out the disk that it was attached to 
+Will attach `randomDMG.dmg` and print out the disk that it was attached to 
 
 ### Attaching options:
 The following options can be used with `-a / --attach`:
