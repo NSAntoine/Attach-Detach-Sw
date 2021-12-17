@@ -63,7 +63,9 @@ func attachDMG(DMGFile dmg:String) {
     
     // check if there were any issues encountered with attach parameters
     if let attachParamsErr = attachParamsErr {
-        fatalError("Error encountered while setting Attach Parameters: \(attachParamsErr.localizedDescription)")
+        print("Error encountered while setting Attach Parameters: \(attachParamsErr.localizedDescription)")
+        print("Recovery Suggestion: \(attachParamsErr.localizedRecoverySuggestion ?? "Not available")")
+        fatalError()
     }
     
     // Handler which will have the info of the attached DMG
@@ -80,6 +82,7 @@ func attachDMG(DMGFile dmg:String) {
         // Print the error if we can
         if let attachErr = attachErr {
             print("Error encountered with attaching DMG: \(attachErr.localizedDescription)")
+            print("Recovery Suggestion: \(attachErr.localizedRecoverySuggestion ?? "Not available")")
         }
         fatalError("Couldn't successfully attach DMG \(dmg).")
     }
