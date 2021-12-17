@@ -49,15 +49,13 @@ func AttachDMG(atPath path: String, completionHandler: (DIDeviceHandle?, Error?)
     
     AttachParams?.autoMount = CMDLineArgs.contains("-s") || CMDLineArgs.contains("--set-auto-mount")
     
-    var handle: DIDeviceHandle?
+    // The handler which will contain information about the specified disk
+    var Handler: DIDeviceHandle?
     
     var AttachErr: NSError?
-    let didSuccessfullyAttach = DiskImages2.attach(with: AttachParams, handle: &handle, error: &AttachErr)
-    if let AttachErr = AttachErr {
-        return completionHandler(nil, AttachErr)
-    }
+    DiskImages2.attach(with: AttachParams, handle: &Handler, error: &AttachErr)
     
-    return completionHandler(handle, nil)
+    return completionHandler(Handler, AttachErr)
 }
 
 /// Returns the Attach filemode specified by the user using the `--file-mode=/-f=` options
