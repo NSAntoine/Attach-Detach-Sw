@@ -18,7 +18,7 @@ The following options can be used with `-a / --attach`:
 - `-o, --all-dirs`            Prints all the directories to which the DMG was attached to
 
 ## Detaching
-To detach, use `-d / --detach` option and specify the Disk Name(s) to detach, for example:
+To detach, use the `-d / --detach` option and specify the Disk Name(s) to detach, for example:
 ```
 attachdetachsw -d disk7
 ```
