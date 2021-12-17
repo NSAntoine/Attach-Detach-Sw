@@ -85,3 +85,37 @@ func returnFileModeFromCMDLine() -> Int64 {
     }
     return fileModeArray[0]
 }
+
+func getImageURLOfDisk(atPath path: String, completionHandler: (URL?, Error?) -> Void) {
+    var ImageURLError: NSError?
+    let url = URL(fileURLWithPath: path)
+    do {
+        let ImageURL = try DiskImages2.imageURL(
+            fromDevice: url
+        )
+        return completionHandler(ImageURL as? URL, nil)
+    } catch {
+        return completionHandler(nil, error)
+    }
+}
+
+let helpMessage = """
+AttachDetachSW --- By Serena-io
+A CommandLine Tool to attach and detach DMGs on iOS
+Usage: attachdetachsw [--attach/-a | --detach/-d] [FILE], where FILE is a Disk Name to detach or a DMG to attach
+Options:
+
+    General Options:
+        -a, --attach [DMGFILE]                  Attach the DMGFile specified
+        -d, --detach [DISKNAME]                 Detach the Disk Name specified
+        -i, --image-url [DISKNAME]              Prints the original image url of the specified Disk Name
+
+    Attach Options:
+        -f, --file-mode=FILE-MODE               Specify a FileMode to attach the DMG with, specified FileMode must be a number
+        -s, --set-auto-mount                    Sets Auto-Mount to true while attaching
+        -r, --reg-entry-id                      Prints the RegEntryID of the disk that the DMG was attached to
+        -o, --all-dirs                          Prints all the directories to which the DMG was attached to
+Example usage:
+    attachdetachsw --attach randomDMG.dmg
+    attachdetachsw --detach disk8
+"""
