@@ -31,25 +31,19 @@ if CMDLineArgs.isEmpty {
 
 // Support for --image-url / -i
 if shouldPrintImageURL {
-    var optToParse: String {
-        // if the user used the long option, return the long opt, otherwise
-        // otherwise return the shortopt
-        return CMDLineArgs.contains("--image-url") ? "--image-url" : "-i"
-    }
-    guard let index = CMDLineArgs.firstIndex(of: optToParse), CMDLineArgs.indices.contains(index + 1) else {
-        print("User used \(optToParse) but did not specify a image URL.")
-        exit(EXIT_FAILURE)
-    }
-    var disk = CMDLineArgs[index + 1]
-    if !disk.hasPrefix("/dev/") {
-        disk.insert(contentsOf: "/dev/", at: disk.startIndex)
-    }
-    getImageURLOfDisk(atPath: disk) { url, error in
-        guard let url = url, error == nil else {
-            print("Error encountered while getting original image URL of \(disk): \(error?.localizedDescription ?? "Unknown Error")")
-            exit(EXIT_FAILURE)
+    for var diskPath in DevDiskPathsInputted {
+        if !diskPath.hasPrefix("/dev/") {
+            diskPath.insert(contentsOf: "/dev/", at: diskPath.startIndex)
         }
-        print("Original Image URL of \(disk): \(url.path)")
+        
+        getImageURLOfDisk(atPath: diskPath) { url, error in
+            guard let url = url, error == nil else {
+                print("Error encountered while getting original Image URL of \(diskPath): \(error?.localizedDescription ?? "Unknown Error")")
+                exit(EXIT_FAILURE)
+            }
+            
+            print("original image URL of \(diskPath): \(url.path)")
+        }
     }
 }
 
@@ -59,7 +53,10 @@ if shouldDetach {
     }
     
     for var diskName in DevDiskPathsInputted {
-        detachDisk(diskName: &diskName)
+        if !diskName.hasPrefix("/dev/") {
+            diskName.insert(contentsOf: "/dev/", at: diskName.startIndex)
+        }
+        detachDisk(diskName: diskName)
     }
 }
 

@@ -17,10 +17,7 @@ func getIoctlNumber(group: Character, number n:UInt) -> UInt {
     return void | g | n
 }
 
-func detachDisk(diskName: inout String) {
-    if !diskName.hasPrefix("/dev/") {
-        diskName.insert(contentsOf: "/dev/", at: diskName.startIndex)
-    }
+func detachDisk(diskName: String) {
     
     let fd = open(diskName, O_RDONLY)
     // Just to be safe, close it once done
@@ -86,7 +83,10 @@ func returnFileModeFromCMDLine() -> Int64 {
     return fileModeArray[0]
 }
 
+/// Returns the original image URL
+/// that a disk was attached with
 func getImageURLOfDisk(atPath path: String, completionHandler: (URL?, Error?) -> Void) {
+    
     var ImageURLError: NSError?
     let url = URL(fileURLWithPath: path)
     do {
@@ -106,9 +106,9 @@ Usage: attachdetachsw [--attach/-a | --detach/-d] [FILE], where FILE is a Disk N
 Options:
 
     General Options:
-        -a, --attach    [DMGFILE]                  Attach the DMGFile specified
-        -d, --detach    [DISKNAME]                 Detach the Disk Name specified
-        -i, --image-url [DISKNAME]                 Prints the original image url of the specified Disk Name
+        -a, --attach    [DMGFILE]                  Attach the specified DMG File
+        -d, --detach    [DISKNAME]                 Detach the specified Disk name
+        -i, --image-url [DISKNAME]                 Print the original image url that the specified disk name was attached with
 
     Attach Options:
         -f, --file-mode=FILE-MODE                  Specify a FileMode to attach the DMG with, specified FileMode must be a number
