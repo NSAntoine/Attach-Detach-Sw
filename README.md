@@ -17,7 +17,7 @@ The following options can be used with `-a / --attach`:
 - `-r, --reg-entry-id`               Prints the RegEntryID of the disk that the DMG was attached to
 - `-o, --all-dirs`                   Prints all the directories to which the DMG was attached to
 
-*Notes: If -m/--auto-mount wasn't used, auto mount is automatically set to true*
+*Notes: If -s/--set-auto-mount wasn't used, auto mount is automatically set to true*
 
 ## Detaching
 To detach, use the `-d / --detach` option and specify the Disk Name(s) to detach, for example:
