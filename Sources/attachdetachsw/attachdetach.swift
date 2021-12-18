@@ -62,21 +62,16 @@ func AttachDMG(atPath path: String, completionHandler: (DIDeviceHandle?, Error?)
 func returnFileModeFromCMDLine() -> Int64 {
     /// The array who's first element (may) be the specified filemode
     let fileModeArray = CMDLineArgs.filter {
-        // First lets filter the array by the element that contains --file-mode= or -f= in it
-        $0.hasPrefix("--file-mode=") || $0.hasPrefix("-f=")
-    }.map {
-        // And now lets remove --file-mode=/-f= from the string
-        $0.replacingOccurrences(of: "--file-mode=", with: "")
-            .replacingOccurrences(of: "-f=", with: "")
+        $0.starts(with: "--file-mode=") || $0.starts(with: "-f=")
+    }.flatMap {
+        // Seperate the strings by the =
+        $0.components(separatedBy: "=")
     }.compactMap {
-        // And now lets allow only Int64 in the array
+        // Now only allow the number
         Int64($0)
     }
     
-    if fileModeArray.isEmpty {
-        return 0
-    }
-    return fileModeArray[0]
+    return fileModeArray.isEmpty ? 0 : fileModeArray[0]
 }
 
 /// Returns the original image URL
