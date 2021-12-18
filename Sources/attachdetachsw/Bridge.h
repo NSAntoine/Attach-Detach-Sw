@@ -17,7 +17,7 @@
 }
 @property (assign) BOOL autoMount;                                         //@synthesize autoMount=_autoMount - In the implementation block
 @property (assign,nonatomic) long long fileMode;                           //@synthesize fileMode=_fileMode - In the implementation block
--(id)initWithURL:(id)arg1 error:(id)arg2 ;
+-(id)initWithURL:(id)arg1 error:(NSError **)arg2 ;
 -(id)initWithCoder:(id)arg1 ;
 -(BOOL)autoMount;
 -(long long)fileMode;

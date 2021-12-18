@@ -36,23 +36,19 @@ func detachDisk(diskPath path: String, completionHandler: (_ didDetach: Bool, _ 
     return completionHandler(true, nil)
 }
 
-func AttachDMG(atPath path: String, completionHandler: (DIDeviceHandle?, Error?) -> Void) {
-    var AttachParamsErr: NSError?
-    let AttachParams = DIAttachParams(url: URL(fileURLWithPath: path), error: AttachParamsErr)
-    if let AttachParamsErr = AttachParamsErr {
-        return completionHandler(nil, AttachParamsErr)
-    }
-    
-    // Set the filemode
-    // if the user didn't specify it by the command line, it'll be 0
-    AttachParams?.fileMode = returnFileModeFromCMDLine()
-    
-    AttachParams?.autoMount = CMDLineArgs.contains("-s") || CMDLineArgs.contains("--set-auto-mount")
-    
-    // The handler which will contain information about the specified disk
-    var Handler: DIDeviceHandle?
+func AttachDMG(atPath path: String, doAutoMount: Bool = true, fileMode: Int64 = 0, completionHandler: (DIDeviceHandle?, Error?) -> Void) {
     
     do {
+        let AttachParams = try DIAttachParams(url: URL(fileURLWithPath: path))
+
+        // Set the filemode
+        AttachParams.fileMode = fileMode
+        
+        // Set whether or not to auto mount the DMG
+        AttachParams.autoMount = doAutoMount
+        
+        var Handler: DIDeviceHandle?
+        
         try DiskImages2.attach(with: AttachParams, handle: &Handler)
         return completionHandler(Handler, nil)
     } catch {
@@ -77,6 +73,20 @@ func returnFileModeFromCMDLine() -> Int64 {
     return fileModeArray.isEmpty ? 0 : fileModeArray[0]
 }
 
+
+/// Returns true or false based on the boolean the user used in --auto-mount=
+/// If --auto-mount wasn't used, this returns true
+func returnAutoMountCMDLineStatus() -> Bool {
+    let autoMountArray = CMDLineArgs.filter {
+        $0.starts(with: "--set-auto-mount=") || $0.starts(with: "-s=")
+    }.flatMap {
+        $0.components(separatedBy: "=")
+    }.compactMap {
+        Bool($0)
+    }
+    
+    return autoMountArray.isEmpty ? true : autoMountArray[0]
+}
 /// Returns the original image URL
 /// that a disk was attached with
 func getImageURLOfDisk(atPath path: String, completionHandler: (URL?, Error?) -> Void) {
@@ -106,7 +116,7 @@ Options:
 
     Attach Options:
         -f, --file-mode=FILE-MODE                  Specify a FileMode to attach the DMG with, specified FileMode must be a number
-        -s, --set-auto-mount                       Sets Auto-Mount to true while attaching
+        -s, --set-auto-mount=TRUE/FALSE            Sets Auto-Mount to true or false based on which the user specified, true by default
         -r, --reg-entry-id                         Prints the RegEntryID of the disk that the DMG was attached to
         -o, --all-dirs                             Prints all the directories to which the DMG was attached to
 

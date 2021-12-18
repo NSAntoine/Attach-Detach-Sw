@@ -73,7 +73,7 @@ if shouldAttach {
     }
     
     for DMG in DMGSInputted {
-        AttachDMG(atPath: DMG) { Handler, error in
+        AttachDMG(atPath: DMG, doAutoMount: returnAutoMountCMDLineStatus(), fileMode: returnFileModeFromCMDLine()) { Handler, error in
             // Make sure we encountered no issues
             guard let Handler = Handler, let BSDName = Handler.bsdName, error == nil else {
                 print("Error encountered while attaching DMG \(DMG): \(error?.localizedDescription ?? "Unknown Error")")
