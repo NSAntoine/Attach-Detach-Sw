@@ -50,7 +50,7 @@
 
 @interface DiskImages2 : NSObject
 // Attaches a specified DMG
-+(bool)attachWithParams:(DIAttachParams *)param handle:(DIDeviceHandle **)h error:(NSError **)err;
++(BOOL)attachWithParams:(DIAttachParams *)param handle:(DIDeviceHandle **)h error:(NSError **)err;
 // Prints the URL from which an attached disk came from
 +(id)imageURLFromDevice:(id)arg1 error:(NSError **)arg2;
 

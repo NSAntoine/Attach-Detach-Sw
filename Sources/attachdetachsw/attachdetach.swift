@@ -52,10 +52,13 @@ func AttachDMG(atPath path: String, completionHandler: (DIDeviceHandle?, Error?)
     // The handler which will contain information about the specified disk
     var Handler: DIDeviceHandle?
     
-    var AttachErr: NSError?
-    DiskImages2.attach(with: AttachParams, handle: &Handler, error: &AttachErr)
+    do {
+        try DiskImages2.attach(with: AttachParams, handle: &Handler)
+        return completionHandler(Handler, nil)
+    } catch {
+        return completionHandler(nil, error)
+    }
     
-    return completionHandler(Handler, AttachErr)
 }
 
 /// Returns the Attach filemode specified by the user using the `--file-mode=/-f=` options
