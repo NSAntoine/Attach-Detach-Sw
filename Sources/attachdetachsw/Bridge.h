@@ -4,6 +4,8 @@
 -(id)initWithCoder:(id)arg1 ;
 -(NSURL *)inputURL;
 -(void)encodeWithCoder:(id)arg1 ;
+ // function for attaching the DMG:
+-(id)newAttachWithError:(NSError **)arg1 ;
 -(id)description;
 -(id)initWithURL:(id)arg1 fileOpenMode:(unsigned short)arg2 error:(id)arg3 ;
 @end
@@ -49,8 +51,6 @@
 @end
 
 @interface DiskImages2 : NSObject
-// Attaches a specified DMG
-+(BOOL)attachWithParams:(DIAttachParams *)param handle:(DIDeviceHandle **)h error:(NSError **)err;
 // Prints the URL from which an attached disk came from
 +(id)imageURLFromDevice:(id)arg1 error:(NSError **)arg2;
 

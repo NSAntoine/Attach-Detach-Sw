@@ -26,7 +26,7 @@ attachdetachsw -d disk7
 ```
 Will detach `disk7`, using `/dev/disk7` would be identical in this situation
 
-*Note: Detaching doesn't have any configurable options`
+*Note: Detaching doesn't have any configurable options*
 
 ## Getting the Image URL Of an attached disk
 To get the original Image URL of a disk that is already attached, use the `-i / --image-url` option, for example:

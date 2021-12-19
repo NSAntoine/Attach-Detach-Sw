@@ -46,11 +46,11 @@ func AttachDMG(atPath path: String, doAutoMount: Bool = true, fileMode: Int64 = 
         
         // Set whether or not to auto mount the DMG
         AttachParams.autoMount = doAutoMount
-        
-        var Handler: DIDeviceHandle?
-        
-        try DiskImages2.attach(with: AttachParams, handle: &Handler)
-        return completionHandler(Handler, nil)
+                
+        // Now use DIAttachParam's newAttachWithError function to attach
+        // the DMG and return the handler
+        var HandlerReturned = try AttachParams.newAttach()
+        return completionHandler(HandlerReturned as? DIDeviceHandle, nil)
     } catch {
         return completionHandler(nil, error)
     }
@@ -87,6 +87,7 @@ func returnAutoMountCMDLineStatus() -> Bool {
     
     return autoMountArray.isEmpty ? true : autoMountArray[0]
 }
+
 /// Returns the original image URL
 /// that a disk was attached with
 func getImageURLOfDisk(atPath path: String, completionHandler: (URL?, Error?) -> Void) {
