@@ -15,7 +15,7 @@ The following options can be used with `-a / --attach`:
 - `-f, --file-mode=FILE-MODE`        Specify a FileMode to attach the DMG with, specified FileMode must be a number
 - `-m, --auto-mount`                 Sets Auto-Mount to true while attaching
 - `-r, --reg-entry-id`               Prints the RegEntryID of the disk that the DMG was attached to
-
+- `-v, --verify`                     Verify that the DMG was attached successfully
 
 ## Detaching
 To detach, use the `-d / --detach` option and specify the Disk Name(s) to detach, for example:

@@ -53,3 +53,9 @@
 +(id)imageURLFromDevice:(id)arg1 error:(NSError **)arg2;
 +(BOOL)attachWithParams:(DIAttachParams *)param handle:(DIDeviceHandle **)h error:(NSError **)err;
 @end
+
+@interface DIVerifyParams : DIBaseParams
++(BOOL)supportsSecureCoding;
+-(id)initWithURL:(id)arg1 error:(NSError **)arg2 ;
+-(BOOL)verifyWithError:(id*)arg1 ;
+@end

@@ -22,8 +22,6 @@ let shouldDetach = CMDLineArgs.contains("--detach") || CMDLineArgs.contains("-d"
 let shouldAttach = CMDLineArgs.contains("--attach") || CMDLineArgs.contains("-a")
 let shouldPrintImageURL = CMDLineArgs.contains("--image-url") || CMDLineArgs.contains("-i")
 
-let shouldPrintAllAttachedDirs = CMDLineArgs.contains("--all-dirs") || CMDLineArgs.contains("-o")
-let shouldPrintRegEntryID = CMDLineArgs.contains("--reg-entry-id") || CMDLineArgs.contains("-r")
 
 if CMDLineArgs.isEmpty {
     print(helpMessage)
@@ -74,6 +72,8 @@ if shouldAttach {
     
     let shouldAutoMount = CMDLineArgs.contains("--auto-mount") || CMDLineArgs.contains("-m")
     
+    let shouldPrintRegEntryID = CMDLineArgs.contains("--reg-entry-id") || CMDLineArgs.contains("-r")
+    let shouldVerify = CMDLineArgs.contains("--verify") || CMDLineArgs.contains("-v")
     
     for DMG in DMGSInputted {
         let Handler: DIDeviceHandle?
@@ -89,6 +89,20 @@ if shouldAttach {
         guard let Handler = Handler, let BSDName = Handler.bsdName else {
             print("Attached DMG However couldn't get info of attached disk.")
             exit(EXIT_FAILURE)
+        }
+        
+        if shouldVerify {
+            guard let verifyParams = try? DIVerifyParams(url: URL(fileURLWithPath: "/dev/\(BSDName)")) else {
+                      print("Couldn't verify that DMG Was attached Successfully")
+                      exit(EXIT_FAILURE)
+                  }
+            let verifyStatus = verifyParams.verifyWithError(nil)
+            if verifyStatus {
+                print("Verified that DMG Was attached successfully")
+            } else {
+                print("DMG Was NOT Attached successfully!")
+                exit(EXIT_FAILURE)
+            }
         }
         
         print("Attached \(DMG) as \(BSDName)")
