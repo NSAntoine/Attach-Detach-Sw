@@ -74,27 +74,30 @@ if shouldAttach {
     let shouldAutoMount = CMDLineArgs.contains("--auto-mount") || CMDLineArgs.contains("-m")
     
     for DMG in DMGSInputted {
-        AttachDMG(atPath: DMG, doAutoMount: shouldAutoMount, fileMode: returnFileModeFromCMDLine()) { Handler, error in
-            // Make sure we encountered no issues
-            guard let Handler = Handler, let BSDName = Handler.bsdName, error == nil else {
-                print("Error encountered while attaching DMG \(DMG): \(error?.localizedDescription ?? "Unknown Error")")
+        do {
+            let Handler = try AttachDMG(atPath: DMG, doAutoMount: shouldAutoMount, fileMode: returnFileModeFromCMDLine())
+            guard let Handler = Handler, let BSDName = Handler.bsdName else {
+                print("Attached DMG However couldn't get info of attached disk.")
                 exit(EXIT_FAILURE)
             }
             
             print("Attached \(DMG) as \(BSDName)")
             
-            // If the user specified to print all the directories that the DMG was attached to
-            // Print them
             if shouldPrintAllAttachedDirs {
-                let attachedDirsThatExist = ["/dev/\(BSDName)", "/dev/\(BSDName)s1", "/dev/\(BSDName)s1s1"].filter {
-                    fm.fileExists(atPath: $0)
+                // Make an array of the dev disk directories that should exist, and filter by the ones that actually do
+                let devDiskDirsThatExist = ["/dev/\(BSDName)", "/dev/\(BSDName)s1", "/dev/\(BSDName)s1s1"].filter {
+                    FileManager.default.fileExists(atPath: $0)
                 }
-                print(attachedDirsThatExist.joined(separator: ", "))
+                print(devDiskDirsThatExist.joined(separator: ", "))
             }
             
             if shouldPrintRegEntryID {
                 print("\(BSDName) RegEntryID: \(Handler.regEntryID)")
             }
+            
+        } catch {
+            print("Error encountered while attaching DMG \(DMG): \(error.localizedDescription)")
+            exit(EXIT_FAILURE)
         }
     }
 }

@@ -36,25 +36,26 @@ func detachDisk(diskPath path: String, completionHandler: (_ didDetach: Bool, _ 
     return completionHandler(true, nil)
 }
 
-func AttachDMG(atPath path: String, doAutoMount: Bool = true, fileMode: Int64 = 0, completionHandler: (DIDeviceHandle?, Error?) -> Void) {
+/// Attaches a specified DMG Path
+/// - Parameters:
+///   - path: The path of the DMG to attach
+///   - fileMode: The filemode to attach the DMG With
+/// - Throws: An error that was encountered while attaching
+/// - Returns: The Handle of the disk that was attached
+func AttachDMG(atPath path: String, doAutoMount: Bool = false, fileMode: Int64 = 0) throws -> DIDeviceHandle? {
     
-    do {
-        let AttachParams = try DIAttachParams(url: URL(fileURLWithPath: path))
-
-        // Set the filemode
-        AttachParams.fileMode = fileMode
-        
-        // Set whether or not to auto mount the DMG
-        AttachParams.autoMount = doAutoMount
-        
-        var Handler: DIDeviceHandle?
-        
-        try DiskImages2.attach(with: AttachParams, handle: &Handler)
-        return completionHandler(Handler, nil)
-    } catch {
-        return completionHandler(nil, error)
-    }
+    let AttachParams = try DIAttachParams(url: URL(fileURLWithPath: path))
     
+    // Set the filemode
+    AttachParams.fileMode = fileMode
+    
+    // Set whether or not to auto mount the DMG
+    AttachParams.autoMount = doAutoMount
+    
+    var Handler: DIDeviceHandle?
+    
+    try DiskImages2.attach(with: AttachParams, handle: &Handler)
+    return Handler
 }
 
 /// Returns the Attach filemode specified by the user using the `--file-mode=/-f=` options
