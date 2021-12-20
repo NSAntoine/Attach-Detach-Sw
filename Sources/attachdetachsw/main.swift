@@ -1,4 +1,5 @@
 import Foundation
+import DI2Support
 
 /// Array of command line arguments given by the user
 let CMDLineArgs = Array(CommandLine.arguments.dropFirst())
@@ -73,31 +74,27 @@ if shouldAttach {
     
     let shouldAutoMount = CMDLineArgs.contains("--auto-mount") || CMDLineArgs.contains("-m")
     
+    
     for DMG in DMGSInputted {
+        let Handler: DIDeviceHandle?
+        
         do {
-            let Handler = try AttachDMG(atPath: DMG, doAutoMount: shouldAutoMount, fileMode: returnFileModeFromCMDLine())
-            guard let Handler = Handler, let BSDName = Handler.bsdName else {
-                print("Attached DMG However couldn't get info of attached disk.")
-                exit(EXIT_FAILURE)
-            }
-            
-            print("Attached \(DMG) as \(BSDName)")
-            
-            if shouldPrintAllAttachedDirs {
-                // Make an array of the dev disk directories that should exist, and filter by the ones that actually do
-                let devDiskDirsThatExist = ["/dev/\(BSDName)", "/dev/\(BSDName)s1", "/dev/\(BSDName)s1s1"].filter {
-                    FileManager.default.fileExists(atPath: $0)
-                }
-                print(devDiskDirsThatExist.joined(separator: ", "))
-            }
-            
-            if shouldPrintRegEntryID {
-                print("\(BSDName) RegEntryID: \(Handler.regEntryID)")
-            }
-            
+            Handler = try AttachDMG(atPath: DMG, doAutoMount: shouldAutoMount, fileMode: returnFileModeFromCMDLine())
         } catch {
+            Handler = nil
             print("Error encountered while attaching DMG \(DMG): \(error.localizedDescription)")
             exit(EXIT_FAILURE)
+        }
+        
+        guard let Handler = Handler, let BSDName = Handler.bsdName else {
+            print("Attached DMG However couldn't get info of attached disk.")
+            exit(EXIT_FAILURE)
+        }
+        
+        print("Attached \(DMG) as \(BSDName)")
+        
+        if shouldPrintRegEntryID {
+            print("\(BSDName) RegEntryID: \(Handler.regEntryID)")
         }
     }
 }
