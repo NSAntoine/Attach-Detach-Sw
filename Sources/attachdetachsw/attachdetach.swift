@@ -46,11 +46,11 @@ func AttachDMG(atPath path: String, doAutoMount: Bool = true, fileMode: Int64 = 
         
         // Set whether or not to auto mount the DMG
         AttachParams.autoMount = doAutoMount
-                
-        // Now use DIAttachParam's newAttachWithError function to attach
-        // the DMG and return the handler
-        var HandlerReturned = try AttachParams.newAttach()
-        return completionHandler(HandlerReturned as? DIDeviceHandle, nil)
+        
+        var Handler: DIDeviceHandle?
+        
+        try DiskImages2.attach(with: AttachParams, handle: &Handler)
+        return completionHandler(Handler, nil)
     } catch {
         return completionHandler(nil, error)
     }
@@ -73,35 +73,14 @@ func returnFileModeFromCMDLine() -> Int64 {
     return fileModeArray.isEmpty ? 0 : fileModeArray[0]
 }
 
-
-/// Returns true or false based on the boolean the user used in --auto-mount=
-/// If --auto-mount wasn't used, this returns true
-func returnAutoMountCMDLineStatus() -> Bool {
-    let autoMountArray = CMDLineArgs.filter {
-        $0.starts(with: "--set-auto-mount=") || $0.starts(with: "-s=")
-    }.flatMap {
-        $0.components(separatedBy: "=")
-    }.compactMap {
-        Bool($0)
-    }
-    
-    return autoMountArray.isEmpty ? true : autoMountArray[0]
-}
-
 /// Returns the original image URL
 /// that a disk was attached with
-func getImageURLOfDisk(atPath path: String, completionHandler: (URL?, Error?) -> Void) {
-    
-    var ImageURLError: NSError?
+func getImageURLOfDisk(atPath path: String) throws -> URL? {
     let url = URL(fileURLWithPath: path)
-    do {
-        let ImageURL = try DiskImages2.imageURL(
-            fromDevice: url
-        )
-        return completionHandler(ImageURL as? URL, nil)
-    } catch {
-        return completionHandler(nil, error)
-    }
+    let ImageURL = try DiskImages2.imageURL(
+        fromDevice: url
+    )
+    return ImageURL as? URL
 }
 
 let helpMessage = """
@@ -117,7 +96,7 @@ Options:
 
     Attach Options:
         -f, --file-mode=FILE-MODE                  Specify a FileMode to attach the DMG with, specified FileMode must be a number
-        -s, --set-auto-mount=TRUE/FALSE            Sets Auto-Mount to true or false based on which the user specified, true by default
+        -m, --auto-mount                           Sets Auto-Mount to true while attaching
         -r, --reg-entry-id                         Prints the RegEntryID of the disk that the DMG was attached to
         -o, --all-dirs                             Prints all the directories to which the DMG was attached to
 

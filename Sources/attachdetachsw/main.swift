@@ -36,14 +36,13 @@ if shouldPrintImageURL {
             diskPath.insert(contentsOf: "/dev/", at: diskPath.startIndex)
         }
         
-        getImageURLOfDisk(atPath: diskPath) { url, error in
-            guard let url = url, error == nil else {
-                print("Error encountered while getting original Image URL of \(diskPath): \(error?.localizedDescription ?? "Unknown Error")")
-                exit(EXIT_FAILURE)
-            }
-            
-            print("original image URL of \(diskPath): \(url.path)")
+        do {
+            let diskURL = try getImageURLOfDisk(atPath: diskPath)
+            print("Original Image URL of \(diskPath): \(diskURL?.path ?? "Unknown Path")")
+        } catch {
+            print("Error while getting original Image URL of \(diskPath): \(error.localizedDescription)")
         }
+        
     }
 }
 
@@ -72,8 +71,10 @@ if shouldAttach {
         fatalError("User used --attach / -a however did not specify a DMG to attach.")
     }
     
+    let shouldAutoMount = CMDLineArgs.contains("--auto-mount") || CMDLineArgs.contains("-m")
+    
     for DMG in DMGSInputted {
-        AttachDMG(atPath: DMG, doAutoMount: returnAutoMountCMDLineStatus(), fileMode: returnFileModeFromCMDLine()) { Handler, error in
+        AttachDMG(atPath: DMG, doAutoMount: shouldAutoMount, fileMode: returnFileModeFromCMDLine()) { Handler, error in
             // Make sure we encountered no issues
             guard let Handler = Handler, let BSDName = Handler.bsdName, error == nil else {
                 print("Error encountered while attaching DMG \(DMG): \(error?.localizedDescription ?? "Unknown Error")")

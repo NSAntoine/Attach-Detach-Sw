@@ -13,11 +13,10 @@ Will attach `randomDMG.dmg` and print out the disk that it was attached to
 The following options can be used with `-a / --attach`:
 
 - `-f, --file-mode=FILE-MODE`        Specify a FileMode to attach the DMG with, specified FileMode must be a number
-- `-s, --set-auto-mount=TRUE/FALSE`  Sets Auto-Mount to true or false based on which the user specified
+- `-m, --auto-mount`                 Sets Auto-Mount to true while attaching
 - `-r, --reg-entry-id`               Prints the RegEntryID of the disk that the DMG was attached to
 - `-o, --all-dirs`                   Prints all the directories to which the DMG was attached to
 
-*Notes: If -s/--set-auto-mount wasn't used, auto mount is automatically set to true*
 
 ## Detaching
 To detach, use the `-d / --detach` option and specify the Disk Name(s) to detach, for example:
