@@ -77,9 +77,14 @@ if shouldAttach {
     
     for DMG in DMGSInputted {
         let Handler: DIDeviceHandle?
+        let fileMode = returnFileModeFromCMDLine()
         
         do {
-            Handler = try AttachDMG(atPath: DMG, doAutoMount: shouldAutoMount, fileMode: returnFileModeFromCMDLine())
+            Handler = try AttachDMG(
+                atPath: DMG,
+                doAutoMount: shouldAutoMount,
+                fileMode: fileMode
+            )
         } catch {
             Handler = nil
             print("Error encountered while attaching DMG \(DMG): \(error.localizedDescription)")
@@ -93,16 +98,17 @@ if shouldAttach {
         
         if shouldVerify {
             guard let verifyParams = try? DIVerifyParams(url: URL(fileURLWithPath: "/dev/\(BSDName)")) else {
-                      print("Couldn't verify that DMG Was attached Successfully")
-                      exit(EXIT_FAILURE)
-                  }
-            let verifyStatus = verifyParams.verifyWithError(nil)
-            if verifyStatus {
-                print("Verified that DMG Was attached successfully")
-            } else {
-                print("DMG Was NOT Attached successfully!")
+                print("Couldn't verify that DMG Was attached Successfully")
                 exit(EXIT_FAILURE)
             }
+            
+            let verifyStatus = verifyParams.verifyWithError(nil)
+            guard verifyStatus else {
+                print("DMG was not attached successfully.")
+                exit(EXIT_FAILURE)
+            }
+            
+            print("Verified that DMG \(DMG) was successfully attached")
         }
         
         print("Attached \(DMG) as \(BSDName)")
