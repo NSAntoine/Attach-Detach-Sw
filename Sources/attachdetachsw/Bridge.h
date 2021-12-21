@@ -8,6 +8,8 @@
 -(id)initWithURL:(id)arg1 fileOpenMode:(unsigned short)arg2 error:(id)arg3 ;
 @end
 
+NSString *compileDate = @__DATE__;
+NSString *compileTime = @__TIME__;
 
 @interface DIAttachParams : DIBaseParams {
 
@@ -46,6 +48,7 @@
 -(void)dealloc;
 -(unsigned long long)regEntryID;
 -(BOOL)waitForDeviceWithError:(id*)arg1 ;
+-(id)initWithRegEntryID:(unsigned long long)arg1;
 @end
 
 @interface DiskImages2 : NSObject

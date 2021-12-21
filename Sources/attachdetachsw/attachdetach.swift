@@ -87,6 +87,7 @@ func getImageURLOfDisk(atPath path: String) throws -> URL? {
 let helpMessage = """
 AttachDetachSW --- By Serena-io
 A CommandLine Tool to attach and detach DMGs on iOS
+Compiled \(compileDate), \(compileTime)
 Usage: attachdetachsw [--attach/-a | --detach/-d] [FILE], where FILE is a Disk Name to detach or a DMG to attach
 Options:
 
