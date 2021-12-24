@@ -71,6 +71,8 @@ func returnFileModeFromCMDLine() -> Int64 {
         Int64($0)
     }
     
+    // If the array is empty, return 0
+    // otherwise return the first element of the array
     return fileModeArray.isEmpty ? 0 : fileModeArray[0]
 }
 

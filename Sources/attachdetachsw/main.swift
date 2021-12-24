@@ -23,7 +23,7 @@ let shouldAttach = CMDLineArgs.contains("--attach") || CMDLineArgs.contains("-a"
 let shouldPrintImageURL = CMDLineArgs.contains("--image-url") || CMDLineArgs.contains("-i")
 
 
-if CMDLineArgs.isEmpty {
+if CMDLineArgs.isEmpty || CMDLineArgs.contains("--help") || CMDLineArgs.contains("-h") {
     print(helpMessage)
     exit(0)
 }
